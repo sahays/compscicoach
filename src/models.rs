@@ -13,7 +13,15 @@ pub struct AuthorRequestModel {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AuthorResponseModel;
+pub struct AuthorResponseModel {
+    pub id: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub bio: String,
+    pub photo_url: String,
+    pub intro: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TagRequestModel;
@@ -137,5 +145,29 @@ impl AuthorRequestModel {
             photo_url: self.photo_url.to_string(),
             intro: self.intro.to_string(),
         }
+    }
+}
+
+impl AuthorResponseModel {
+    pub fn from(entity: AuthorEntity) -> Self {
+        AuthorResponseModel {
+            id: entity._id.unwrap().to_string(),
+            first_name: entity.name.split_whitespace().next().unwrap().to_string(),
+            last_name: entity.name.split_whitespace().last().unwrap().to_string(),
+            email: entity.email.to_string(),
+            bio: entity.bio.to_string(),
+            photo_url: entity.photo_url.to_string(),
+            intro: entity.intro.to_string(),
+        }
+    }
+
+    pub fn from_vec(entities: Vec<AuthorEntity>) -> Vec<Self> {
+        let mut authors = vec![];
+
+        for entity in entities {
+            authors.push(AuthorResponseModel::from(entity));
+        }
+
+        authors
     }
 }

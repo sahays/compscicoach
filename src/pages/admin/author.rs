@@ -6,8 +6,8 @@ use mongodb::Client;
 use serde_json::json;
 
 use crate::{
-    entities::result_types::EntityResult,
-    models::AuthorRequestModel,
+    entities::{blogs::AuthorEntity, result_types::EntityResult},
+    models::{AuthorRequestModel, AuthorResponseModel},
     utils::{
         db_ops, file_ops,
         json_ops::{self, JsonOpsResult},
@@ -15,10 +15,7 @@ use crate::{
 };
 
 #[get("/admin/author")]
-pub async fn get_create_author(
-    handlebars: web::Data<Handlebars<'_>>,
-    _mongoc: web::Data<Client>,
-) -> impl Responder {
+pub async fn get_create_author(handlebars: web::Data<Handlebars<'_>>) -> impl Responder {
     render_template!(
         handlebars,
         "author-create",
@@ -29,6 +26,33 @@ pub async fn get_create_author(
     )
 }
 
+#[get("/admin/authors")]
+pub async fn get_author_list(
+    handlebars: web::Data<Handlebars<'_>>,
+    mongoc: web::Data<Client>,
+) -> impl Responder {
+    match db_ops::Database
+        .get_all::<AuthorEntity>(&mongoc, "authors")
+        .await
+    {
+        EntityResult::Success(r) => {
+            debug!("{:?}", r);
+            render_template!(
+                handlebars,
+                "author-list",
+                json!({
+                    "title": "All Authors",
+                    "authors": AuthorResponseModel::from_vec(r)
+                })
+            )
+        }
+        EntityResult::Error(e) => {
+            error!("Failed to create author: {:?}", e);
+            HttpResponse::InternalServerError().body("Error listing authors")
+        }
+    }
+}
+
 #[post("/admin/author")]
 pub async fn post_create_author(
     model: web::Json<AuthorRequestModel>,
@@ -37,7 +61,7 @@ pub async fn post_create_author(
     debug!("{:?}", model);
 
     match json_ops::validate_json_text(
-        "./assets/scripts/author-schema.json",
+        "./assets/schema/author-schema.json",
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {

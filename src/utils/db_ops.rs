@@ -45,15 +45,17 @@ impl Database {
 
         match collection.find(doc! {}, None).await {
             Ok(mut cursor) => {
-                let mut entities: Vec<T> = vec![];
-                match cursor.try_next().await {
-                    Ok(Some(entity)) => entities.push(entity),
-                    Ok(None) => (),
-                    Err(e) => {
-                        return EntityResult::Error(DatabaseErrorType::QueryError(
-                            format!("Error getting documents from {}", collection_name),
-                            e.to_string(),
-                        ))
+                let mut entities = vec![];
+                loop {
+                    match cursor.try_next().await {
+                        Ok(Some(entity)) => entities.push(entity),
+                        Ok(None) => break,
+                        Err(e) => {
+                            return EntityResult::Error(DatabaseErrorType::QueryError(
+                                format!("Error getting documents from {}", collection_name),
+                                e.to_string(),
+                            ))
+                        }
                     }
                 }
                 EntityResult::Success(entities)

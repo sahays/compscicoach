@@ -83,10 +83,10 @@ $(function () {
 					$("#errors").hide();
 				},
 				error: function (err) {
-					console.error("Author creation failed:", err);
+					console.error("Author creation failed:", err.responseText);
 					const errorMessage = document.createElement("p");
 					errorMessage.classList.add("text-sm", "p-1");
-					errorMessage.textContent = `${err}`;
+					errorMessage.textContent = err.responseText;
 					$("#errors").append(errorMessage).show();
 				},
 			});

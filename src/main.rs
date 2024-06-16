@@ -15,7 +15,7 @@ use handlebars::Handlebars;
 use mongodb::Client;
 use pages::{
     admin::{
-        author::{get_create_author, post_create_author},
+        author::{get_author_list, get_create_author, post_create_author},
         post::{get_create_blog, post_create_post},
         tag::{get_create_tag, post_create_tag},
     },
@@ -85,6 +85,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_create_tag)
             .service(post_create_tag)
             .service(post_photos)
+            .service(get_author_list)
     })
     .bind((ip, port))?
     .run()
