@@ -33,3 +33,10 @@ pub fn read_files_from_dir(dir: &str, ext: &str) -> Vec<FileInfo> {
     }
     files
 }
+
+pub fn read_file(file: &str) -> Result<String, String> {
+    match std::fs::read_to_string(file) {
+        Ok(c) => Ok(c),
+        Err(e) => Err(format!("Error reading file: [{:?}]", e)),
+    }
+}

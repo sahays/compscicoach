@@ -1,17 +1,27 @@
 #[macro_use]
-mod macros;
-mod environ;
-mod file_ops;
-mod pages;
+pub mod macros;
+pub mod api;
+pub mod entities;
+pub mod models;
+pub mod pages;
+pub mod utils;
 
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{http, middleware, web, App, HttpServer};
+use api::photo::post_photos;
 use dotenv::from_filename;
-use environ::Environ;
-use file_ops::read_files_from_dir;
 use handlebars::Handlebars;
-use sqlx::MySqlPool;
+use mongodb::Client;
+use pages::{
+    admin::{
+        author::{get_create_author, post_create_author},
+        post::{get_create_blog, post_create_post},
+        tag::{get_create_tag, post_create_tag},
+    },
+    index::blogs::get_posts,
+};
+use utils::{environ::Environ, file_ops::read_files_from_dir};
 
 fn configure_handlebars() -> Handlebars<'static> {
     let mut handlebars = Handlebars::new();
@@ -42,16 +52,12 @@ async fn main() -> std::io::Result<()> {
 
     log::debug!("{:?}", env_default);
 
-    let database_url = format!(
-        "{}/{}",
-        env_default.db_connection_string, env_default.db_name
-    );
-    let pool = MySqlPool::connect(database_url.as_str())
+    let mongoc = Client::with_uri_str(env_default.db_connection_string)
         .await
-        .expect("Failed to connect to database");
+        .unwrap();
 
     let ip = "localhost";
-    let port = Environ::default().blog_app_port;
+    let port = env_default.web_app_port;
 
     println!("Actix running at http://{ip}:{port}");
 
@@ -68,8 +74,16 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .wrap(cors)
             .app_data(web::Data::new(handlebars.clone()))
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(mongoc.clone()))
             .service(fs::Files::new("/assets", "./assets").show_files_listing())
+            .service(get_posts)
+            .service(get_create_blog)
+            .service(post_create_post)
+            .service(get_create_author)
+            .service(post_create_author)
+            .service(get_create_tag)
+            .service(post_create_tag)
+            .service(post_photos)
     })
     .bind((ip, port))?
     .run()
