@@ -20,7 +20,7 @@ use pages::{
             post_edit_author,
         },
         post::{get_create_blog, post_create_post},
-        tag::{get_create_tag, post_create_tag},
+        tag::{get_create_tag, get_edit_tag, get_tag_list, post_create_tag, post_edit_tag},
     },
     index::blogs::get_posts,
 };
@@ -86,6 +86,9 @@ async fn main() -> std::io::Result<()> {
             .service(post_create_author)
             .service(get_create_tag)
             .service(post_create_tag)
+            .service(get_tag_list)
+            .service(get_edit_tag)
+            .service(post_edit_tag)
             .service(post_photos)
             .service(get_author_list)
             .service(get_edit_author)

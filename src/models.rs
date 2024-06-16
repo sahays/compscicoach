@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::entities::blogs::AuthorEntity;
+use crate::entities::blogs::{AuthorEntity, TagEntity};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthorRequestModel {
@@ -24,10 +24,17 @@ pub struct AuthorResponseModel {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct TagRequestModel;
+pub struct TagRequestModel {
+    pub name: String,
+    pub description: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct TagResponseModel;
+pub struct TagResponseModel {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostThumbnailModel {
@@ -169,5 +176,35 @@ impl AuthorResponseModel {
         }
 
         authors
+    }
+}
+
+impl TagRequestModel {
+    pub fn to(&self) -> TagEntity {
+        TagEntity {
+            _id: None,
+            name: self.name.to_string(),
+            description: self.description.to_string(),
+        }
+    }
+}
+
+impl TagResponseModel {
+    pub fn from(entity: TagEntity) -> Self {
+        TagResponseModel {
+            id: entity._id.unwrap().to_string(),
+            name: entity.name.to_string(),
+            description: entity.description.to_string(),
+        }
+    }
+
+    pub fn from_vec(entities: Vec<TagEntity>) -> Vec<Self> {
+        let mut tags = vec![];
+
+        for entity in entities {
+            tags.push(TagResponseModel::from(entity));
+        }
+
+        tags
     }
 }
