@@ -1,5 +1,4 @@
-import $ from "jquery";
-import Ajv from "ajv";
+import Ajv from "https://cdn.skypack.dev/ajv";
 
 $(function () {
 	$("#photo-field").on("change", function () {
@@ -49,7 +48,9 @@ $(function () {
 		});
 	});
 	$("#submit-button").on("click", function (event) {
+		var $this = $(this);
 		event.preventDefault();
+
 		var payload = {
 			first_name: $("#first_name").val(),
 			last_name: $("#last_name").val(),
@@ -58,7 +59,7 @@ $(function () {
 			intro: $("#intro").val(),
 			photo_url: $("#photo-url").val(),
 		};
-		console.log("Creating author:", payload);
+		console.log(payload);
 
 		var schema = JSON.parse($("#schema").val());
 		const ajv = new Ajv({ allErrors: true });
@@ -74,16 +75,16 @@ $(function () {
 			});
 		} else {
 			$.ajax({
-				url: "/admin/author",
+				url: $this.data("url"),
 				type: "POST",
 				contentType: "application/json",
 				data: JSON.stringify(payload),
 				success: function (data) {
-					console.log("Author created:", data);
+					console.log(data);
 					$("#errors").hide();
 				},
 				error: function (err) {
-					console.error("Author creation failed:", err.responseText);
+					console.error(err.responseText);
 					const errorMessage = document.createElement("p");
 					errorMessage.classList.add("text-sm", "p-1");
 					errorMessage.textContent = err.responseText;

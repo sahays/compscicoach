@@ -15,7 +15,10 @@ use handlebars::Handlebars;
 use mongodb::Client;
 use pages::{
     admin::{
-        author::{get_author_list, get_create_author, post_create_author},
+        author::{
+            get_author_list, get_create_author, get_edit_author, post_create_author,
+            post_edit_author,
+        },
         post::{get_create_blog, post_create_post},
         tag::{get_create_tag, post_create_tag},
     },
@@ -76,7 +79,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(handlebars.clone()))
             .app_data(web::Data::new(mongoc.clone()))
             .service(fs::Files::new("/assets", "./assets").show_files_listing())
-            .service(fs::Files::new("/dist", "./dist").show_files_listing())
             .service(get_posts)
             .service(get_create_blog)
             .service(post_create_post)
@@ -86,6 +88,8 @@ async fn main() -> std::io::Result<()> {
             .service(post_create_tag)
             .service(post_photos)
             .service(get_author_list)
+            .service(get_edit_author)
+            .service(post_edit_author)
     })
     .bind((ip, port))?
     .run()

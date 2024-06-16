@@ -47,8 +47,38 @@ pub async fn get_author_list(
             )
         }
         EntityResult::Error(e) => {
-            error!("Failed to create author: {:?}", e);
+            error!("Failed to list author: {:?}", e);
             HttpResponse::InternalServerError().body("Error listing authors")
+        }
+    }
+}
+
+#[get("/admin/author/{id}")]
+pub async fn get_edit_author(
+    handlebars: web::Data<Handlebars<'_>>,
+    mongoc: web::Data<Client>,
+    path: web::Path<String>,
+) -> impl Responder {
+    let author_id = path.into_inner();
+    match db_ops::Database
+        .find::<AuthorEntity>(&mongoc, "authors", author_id)
+        .await
+    {
+        EntityResult::Success(r) => {
+            debug!("{:?}", r);
+            render_template!(
+                handlebars,
+                "author-edit",
+                json!({
+                    "title": "Edit Author",
+                    "author": AuthorResponseModel::from(r),
+                    "schema": file_ops::read_file("./assets/schema/author-schema.json").unwrap()
+                })
+            )
+        }
+        EntityResult::Error(e) => {
+            error!("Failed to find author: {:?}", e);
+            HttpResponse::InternalServerError().body("Error finding author")
         }
     }
 }
@@ -76,6 +106,41 @@ pub async fn post_create_author(
                 EntityResult::Error(e) => {
                     error!("Failed to create author: {:?}", e);
                     HttpResponse::InternalServerError().body("Error creating author")
+                }
+            }
+        }
+        JsonOpsResult::Error(e) => {
+            error!("Failed to validate author: {:?}", e);
+            HttpResponse::InternalServerError().body("Error validating author")
+        }
+    }
+}
+
+#[post("/admin/author/{id}")]
+pub async fn post_edit_author(
+    mongoc: web::Data<Client>,
+    path: web::Path<String>,
+    model: web::Json<AuthorRequestModel>,
+) -> impl Responder {
+    let author_id = path.into_inner();
+    debug!("{:?}", model);
+
+    match json_ops::validate_json_text(
+        "./assets/schema/author-schema.json",
+        serde_json::to_string(&model).unwrap().as_str(),
+    ) {
+        JsonOpsResult::Success(_) => {
+            match db_ops::Database
+                .update(&mongoc, "authors", model.to(), author_id)
+                .await
+            {
+                EntityResult::Success(r) => {
+                    info!("Author updated {:?}", r);
+                    HttpResponse::Ok().body("Author updated")
+                }
+                EntityResult::Error(e) => {
+                    error!("Failed to update author: {:?}", e);
+                    HttpResponse::InternalServerError().body("Error updating author")
                 }
             }
         }
