@@ -76,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(handlebars.clone()))
             .app_data(web::Data::new(mongoc.clone()))
             .service(fs::Files::new("/assets", "./assets").show_files_listing())
+            .service(fs::Files::new("/dist", "./dist").show_files_listing())
             .service(get_posts)
             .service(get_create_blog)
             .service(post_create_post)

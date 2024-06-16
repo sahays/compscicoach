@@ -22,7 +22,10 @@ pub async fn get_create_author(
     render_template!(
         handlebars,
         "author-create",
-        json!({"title": "Add a new Author", "schema": file_ops::read_file("./assets/scripts/author-schema.json").unwrap()})
+        json!({
+            "title": "Add a new Author",
+            "schema": file_ops::read_file("./assets/schema/author-schema.json").unwrap()
+        })
     )
 }
 
