@@ -5,6 +5,7 @@
 
 .env.*
 .mongo
+**/uploads/*
 
 .DS_Store
 

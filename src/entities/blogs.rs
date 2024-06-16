@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TagEntity {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
     pub name: String,
     pub description: String,
@@ -12,6 +13,7 @@ pub struct TagEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthorEntity {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
     pub name: String,
     pub email: String,
@@ -22,6 +24,7 @@ pub struct AuthorEntity {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostEntity {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
     pub url: String,
     pub title: String,

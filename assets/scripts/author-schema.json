@@ -26,7 +26,8 @@
 		"photo_url": {
 			"type": "string",
 			"minLength": 1,
-			"maxLength": 511
+			"maxLength": 511,
+			"pattern": "^/(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+.(?:jpg|svg|png|gif)$"
 		},
 		"intro": {
 			"type": "string",

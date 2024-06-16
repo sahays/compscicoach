@@ -8,7 +8,10 @@ use serde_json::json;
 use crate::{
     entities::result_types::EntityResult,
     models::AuthorRequestModel,
-    utils::{db_ops, file_ops},
+    utils::{
+        db_ops, file_ops,
+        json_ops::{self, JsonOpsResult},
+    },
 };
 
 #[get("/admin/author")]
@@ -30,19 +33,28 @@ pub async fn post_create_author(
 ) -> impl Responder {
     debug!("{:?}", model);
 
-    match db_ops::Database
-        .create(&mongoc, "authors", model.to())
-        .await
-    {
-        EntityResult::Success(r) => {
-            info!("Author created {:?}", r);
-
-            HttpResponse::Ok().body("Author created")
+    match json_ops::validate_json_text(
+        "./assets/scripts/author-schema.json",
+        serde_json::to_string(&model).unwrap().as_str(),
+    ) {
+        JsonOpsResult::Success(_) => {
+            match db_ops::Database
+                .create(&mongoc, "authors", model.to())
+                .await
+            {
+                EntityResult::Success(r) => {
+                    info!("Author created {:?}", r);
+                    HttpResponse::Ok().body("Author created")
+                }
+                EntityResult::Error(e) => {
+                    error!("Failed to create author: {:?}", e);
+                    HttpResponse::InternalServerError().body("Error creating author")
+                }
+            }
         }
-        EntityResult::Error(e) => {
-            error!("Failed to create author: {:?}", e);
-
-            HttpResponse::InternalServerError().body("Error creating author")
+        JsonOpsResult::Error(e) => {
+            error!("Failed to validate author: {:?}", e);
+            HttpResponse::InternalServerError().body("Error validating author")
         }
     }
 }
