@@ -26,7 +26,7 @@ pub async fn get_create_post(
         handlebars,
         "post-create",
         json!({
-            "title": "Add a new Author",
+            "title": "Add a new Post",
             "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
         })
     )
@@ -130,8 +130,8 @@ pub async fn get_edit_post(
                 handlebars,
                 "post-edit",
                 json!({
-                    "title": "Edit Author",
-                    "author": PostResponseModel::from(r),
+                    "title": "Edit Post",
+                    "post": PostResponseModel::from(r),
                     "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
                 })
             )
@@ -172,8 +172,8 @@ pub async fn post_edit_post(
             }
         }
         JsonOpsResult::Error(e) => {
-            error!("Failed to validate author: {:?}", e);
-            HttpResponse::BadRequest().body("Error validating author")
+            error!("Failed to validate post: {:?}", e);
+            HttpResponse::BadRequest().body("Error validating post")
         }
     }
 }

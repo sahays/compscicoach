@@ -53,34 +53,38 @@
                     <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">Hero Image (wide
                         aspect ratio):</label>
                     <div class="flex-row md:flex items-baseline">
-                        <input type="file" id="photo-field" name="photo-field" class="mb-4"
-                            accept=".jpg,.jpeg,.png,.gif, .svg" onchange="onFileSelected" />
+                        <input type="file" id="photo-field" name="photo-field" class="mb-4" accept=".jpg,.jpeg" />
                         <div class="flex md:justify-end w-full">
-                            <button type="button" id="upload-button" disabled>Upload
+                            <button type="button" id="upload-button" disabled data-url="/api/photo">Upload
                                 Image</button>
                         </div>
-
+                        <input type="hidden" id="hero-image-url" name="hero-image-url">
+                    </div>
+                    <div id="photo-field-info">
                     </div>
                     <div id="photo-field-error">
                     </div>
                     <div class="mt-2">
                         <img src="https://placehold.co/1024x576" id="hero-image" alt="hero image"
                             class="object-cover border rounded w-full bg-white">
-                        <input type="hidden" id="hero-image-url" name="hero-image-url">
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">More
+                    <label for="more-photos-field" class="block text-gray-700 dark:text-white text-sm mb-2">More
                         Images:</label>
                     <div class="flex-row md:flex items-baseline">
-                        <input type="file" id="photo-field" name="photo-field" class="mb-4"
-                            accept=".jpg,.jpeg,.png,.gif, .svg" onchange="onFileSelected" />
+                        <input type="file" id="more-photos-field" name="more-photos-field" class="mb-4"
+                            accept=".jpg,.jpeg" multiple />
                         <div class="flex md:justify-end w-full">
-                            <button type="button" id="upload-button" disabled>Upload
+                            <button type="button" id="more-photos-upload-button" disabled data-url="/api/photos">Upload
                                 Images</button>
                         </div>
-
+                        <input type="hidden" id="more-photos-url" name="more-photos-url">
+                    </div>
+                    <div id="more-photos-field-info">
+                    </div>
+                    <div id="more-photos-field-error">
                     </div>
                 </div>
 
@@ -116,7 +120,7 @@
                 <input type="hidden" id="schema" value="{{schema}}">
 
                 <div class="flex justify-end">
-                    <button type="submit" id="submit-button" class="button-flashy w-[96]" data-url="/admin/tag">
+                    <button type="submit" id="submit-button" class="button-flashy w-[96]" data-url="/admin/post">
                         Submit
                     </button>
                 </div>
