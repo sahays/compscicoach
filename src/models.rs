@@ -95,7 +95,7 @@ impl AuthorResponseModel {
             last_name: entity.last_name,
             email: entity.email,
             bio: entity.bio,
-            photo_url: entity.photo_url.to_string(),
+            photo_url: entity.photo_url.profile_r_path(),
             intro: entity.intro,
         }
     }

@@ -1,5 +1,10 @@
 {{#> admin-main}}
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {{#unless authors}}
+            <div class="text-center text-gray-400">
+                No authors found. Start by <a href="/admin/author" class="clickable gradient-text">adding one</a>.
+            </div>
+        {{/unless}}
         {{#each authors}}
             <div
                 class="max-w-sm rounded overflow-hidden shadow-lg bg-gray-800 text-white flex flex-col justify-between">

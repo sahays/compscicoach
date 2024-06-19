@@ -1,6 +1,14 @@
 import Ajv from "https://cdn.skypack.dev/ajv";
 
 $(function () {
+	let toggle_form = function (toggle) {
+		$("#upload-button").prop("disabled", toggle);
+		$("#submit-button").prop("disabled", toggle);
+		$("#photo-field").prop("disabled", toggle);
+	};
+	let toggle_upload = function (toggle) {
+		$("#upload-button").prop("disabled", toggle);
+	};
 	$("#photo-field").on("change", function () {
 		var file = this.files[0];
 		console.info("File selected:", file.name);
@@ -12,16 +20,16 @@ $(function () {
 				console.warn("File name exceeds 64 characters.");
 				errorField.text("File name exceeds 64 characters.");
 				$(this).val(""); // Clear the input
-				uploadButton.prop("disabled", true);
+				toggle_upload(true);
 			} else if (file.size > maxSize) {
 				console.warn("File size exceeds 2 MB.");
 				errorField.text("File size exceeds 2 MB.");
 				$(this).val(""); // Clear the input
-				uploadButton.prop("disabled", true);
+				toggle_upload(true);
 			} else {
 				console.info("File is valid.");
 				errorField.text("");
-				uploadButton.prop("disabled", false);
+				toggle_upload(false);
 			}
 		}
 	});
@@ -29,21 +37,27 @@ $(function () {
 		var file = $("#photo-field")[0].files[0];
 		var formData = new FormData();
 		formData.append("photo", file);
+		// disable the form while the photo is uploading
+		toggle_form(true);
 		$.ajax({
-			url: "/api/photos",
+			url: "/api/photo",
 			type: "POST",
 			data: formData,
 			processData: false,
 			contentType: false,
 			success: function (data) {
 				console.log("Upload successful:", data);
-				if (data.path) {
-					$("#profile-photo").attr("src", data.path);
-					$("#photo-url").val(data.path);
+				if (data.paths) {
+					$("#profile-photo").attr("src", data.paths["Thumbnail"]);
+					$("#photo-url").val(data.paths["Original"]);
 				}
+				toggle_form(false);
+				toggle_upload(true);
 			},
 			error: function (err) {
 				console.error("Upload failed:", err);
+				toggle_form(false);
+				toggle_upload(true);
 			},
 		});
 	});
@@ -82,6 +96,7 @@ $(function () {
 				success: function (data) {
 					console.log(data);
 					$("#errors").hide();
+					window.location.href = "/admin/authors";
 				},
 				error: function (err) {
 					console.error(err.responseText);

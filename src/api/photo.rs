@@ -1,20 +1,20 @@
-use std::{ffi::OsStr, fs::File, io::Write, path::Path};
+use std::{collections::HashMap, ffi::OsStr, fs::File, io::Write, path::Path};
 
 use actix_multipart::Multipart;
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
 use image::{imageops::FilterType, GenericImageView};
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    entities::image::{ImagePath, ImageSize, UPLOADS_DIR},
+    entities::image::{ImagePath, ImageSize},
     utils::random_ops,
 };
 
 #[derive(Deserialize, Serialize)]
 pub struct PhotoResponse {
-    pub path: Option<String>,
-    pub filename: Option<String>,
+    pub paths: Option<HashMap<String, String>>,
     pub error: Option<String>,
 }
 
@@ -33,10 +33,12 @@ pub async fn post_photo(mut payload: Multipart) -> impl Responder {
         let unique_key = random_ops::generate_guid(16);
 
         // Create the file path with the unique key and original extension
-        let file_path = format!("{}/{}.{}", UPLOADS_DIR, unique_key, extension);
+        let image_path = ImagePath::new(unique_key.to_string(), extension.to_string());
+
+        debug!("File path: {}", image_path);
 
         // Create a new file and write the contents
-        let mut f = File::create(&file_path).unwrap();
+        let mut f = File::create(image_path.original_path()).unwrap();
 
         // Use a while-let loop to read chunks from the field
         while let Some(chunk) = field.next().await {
@@ -44,13 +46,19 @@ pub async fn post_photo(mut payload: Multipart) -> impl Responder {
             f.write_all(&data).unwrap();
         }
 
-        generate_photo_sizes(&file_path);
+        generate_photo_sizes(&image_path);
 
         // Return the unique key and extension as JSON
-        return HttpResponse::Ok().json((unique_key, extension.to_string()));
+        return HttpResponse::Ok().json(PhotoResponse {
+            paths: Some(image_path.get_all_paths()),
+            error: None,
+        });
     }
 
-    HttpResponse::BadRequest().body("No file uploaded")
+    HttpResponse::BadRequest().json(PhotoResponse {
+        paths: None,
+        error: Some(String::from("Upload failed")),
+    })
 }
 
 #[post("/api/photos")]
@@ -70,41 +78,39 @@ pub async fn post_photos(mut payload: Multipart) -> impl Responder {
         let unique_key = random_ops::generate_guid(16);
 
         // Create the file path with the unique key and original extension
-        let file_path = format!("{}/{}.{}", UPLOADS_DIR, unique_key, extension);
+        let image_path = ImagePath::new(unique_key.to_string(), extension.to_string());
 
         // Create a new file and write the contents
-        let mut f = File::create(&file_path).unwrap();
+        let mut f = File::create(&image_path.original_path()).unwrap();
         while let Some(chunk) = field.next().await {
             let data = chunk.unwrap();
             f.write_all(&data).unwrap();
         }
 
-        generate_photo_sizes(&file_path);
+        generate_photo_sizes(&image_path);
 
         // Append the unique key and extension to the response
-        response.push((unique_key, extension.to_string()));
+        response.push(PhotoResponse {
+            paths: Some(image_path.get_all_paths()),
+            error: None,
+        });
     }
 
     // Return the response as JSON
     HttpResponse::Ok().json(response)
 }
 
-pub fn generate_photo_sizes(file_path: &str) {
-    // Extract key and extension from the file path
-    let path = Path::new(file_path);
-    let key = path.file_stem().unwrap().to_str().unwrap();
-    let extension = path.extension().unwrap().to_str().unwrap();
-
+pub fn generate_photo_sizes(image_path: &ImagePath) {
     // Iterate over all image sizes and create resized photos
-    for size in ImageSize::all_sizes() {
-        resize_photo(size, key, extension);
+    for size in ImageSize::get_display_sizes() {
+        resize_photo(image_path, &size);
     }
 }
 
-pub fn resize_photo(size: ImageSize, key: &str, extension: &str) {
-    let path = ImagePath::new(key.to_string(), extension.to_string());
+pub fn resize_photo(image_path: &ImagePath, size: &ImageSize) {
+    let path = image_path;
     let original_path = path.original_path();
-    let resized_path = path.from(&size);
+    let resized_path = path.from(size);
     let (width, height) = size.dimensions();
 
     // do not proceed if the resized image already exists
@@ -132,7 +138,7 @@ pub fn resize_photo(size: ImageSize, key: &str, extension: &str) {
     resized_img
         .write_to(
             &mut output,
-            image::ImageFormat::from_extension(extension).unwrap(),
+            image::ImageFormat::from_extension(image_path.extension.clone()).unwrap(),
         )
         .unwrap();
 }
