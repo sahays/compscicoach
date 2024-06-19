@@ -3,7 +3,7 @@ use std::str::FromStr;
 use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{self, doc, oid::ObjectId},
-    Client,
+    Client, Collection,
 };
 
 use serde::{de::DeserializeOwned, Serialize};
@@ -16,6 +16,12 @@ use crate::{
 pub struct Database;
 
 impl Database {
+    pub fn get_collection<T>(&self, client: &Client, collection_name: &str) -> Collection<T> {
+        client
+            .database(Environ::default().db_name.as_str())
+            .collection::<T>(collection_name)
+    }
+
     pub async fn create<T>(
         &self,
         client: &Client,
@@ -40,7 +46,7 @@ impl Database {
         }
     }
 
-    pub async fn get_all<T>(&self, client: &Client, collection_name: &str) -> EntityResult<Vec<T>>
+    pub async fn find_all<T>(&self, client: &Client, collection_name: &str) -> EntityResult<Vec<T>>
     where
         T: DeserializeOwned + Unpin + Send + Sync,
     {

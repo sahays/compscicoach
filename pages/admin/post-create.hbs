@@ -1,55 +1,132 @@
-<html lang="en">
+{{#> admin-main}}
+    <div class="grid grid-cols-12 w-full gap-2">
+        <section class="col-span-12">
+            <form id="userForm">
+                <h1 class="text-3xl mb-6 text-gray-800 dark:text-white">Add a New Post</h1>
+                <div class="mb-4">
+                    <label for="title" class="block text-gray-700 dark:text-white text-sm mb-2">Title:</label>
+                    <input type="text" id="title" name="title"
+                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        placeholder="a clickworthy title of the post" required>
+                </div>
+                <div class="mb-4">
+                    <label for="subtitle" class="block text-gray-700 dark:text-white text-sm mb-2">Subtitle:</label>
+                    <input type="text" id="subtitle" name="subtitle"
+                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        placeholder="a sneak peek of the post" required>
+                </div>
+                <div class="mb-4">
+                    <label for="kicker" class="block text-gray-700 dark:text-white text-sm mb-2">Kicker:</label>
+                    <input type="text" id="kicker" name="kicker"
+                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        placeholder="punch line of the post" required>
+                </div>
+                <div class="mb-4">
+                    <label for="body" class="block text-gray-700  dark:text-white text-sm mb-2">Body:</label>
+                    <textarea id="body" name="body"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        rows="25" placeholder="the most engaging and informational part of the post (use markdown)"
+                        required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="description"
+                        class="block text-gray-700  dark:text-white text-sm mb-2">Description:</label>
+                    <textarea id="description" name="description"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        rows="5" placeholder="post description goes in the page header for SEO" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="keywords" class="block text-gray-700  dark:text-white text-sm mb-2">Keywords:</label>
+                    <textarea id="keywords" name="keywords"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        rows="5" placeholder="keywords from the post body" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="tldr" class="block text-gray-700  dark:text-white text-sm mb-2">TL;DR:</label>
+                    <textarea id="tldr" name="tldr"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        rows="5" placeholder="key takeaways or a concise summary of the post" required></textarea>
+                </div>
+                <input type="hidden" id="timestamp" value="{{timestamp}}">
 
-    <head>
-        {{> head}}
-    </head>
+                <div class="mb-4">
+                    <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">Hero Image (wide
+                        aspect ratio):</label>
+                    <div class="flex-row md:flex items-baseline">
+                        <input type="file" id="photo-field" name="photo-field" class="mb-4"
+                            accept=".jpg,.jpeg,.png,.gif, .svg" onchange="onFileSelected" />
+                        <div class="flex md:justify-end w-full">
+                            <button type="button" id="upload-button" disabled>Upload
+                                Image</button>
+                        </div>
 
-    <body class="dark:bg-[#303841] dark:text-stone-100">
-        <nav></nav>
-        <main class="container-default mt-16 p-8 lg:p-0">
-            <form id="articleForm">
-                <label for="url">URL:</label>
-                <input type="text" id="url" name="url"><br>
+                    </div>
+                    <div id="photo-field-error">
+                    </div>
+                    <div class="mt-2">
+                        <img src="https://placehold.co/1024x576" id="hero-image" alt="hero image"
+                            class="object-cover border rounded w-full bg-white">
+                        <input type="hidden" id="hero-image-url" name="hero-image-url">
+                    </div>
+                </div>
 
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title"><br>
+                <div class="mb-4">
+                    <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">More
+                        Images:</label>
+                    <div class="flex-row md:flex items-baseline">
+                        <input type="file" id="photo-field" name="photo-field" class="mb-4"
+                            accept=".jpg,.jpeg,.png,.gif, .svg" onchange="onFileSelected" />
+                        <div class="flex md:justify-end w-full">
+                            <button type="button" id="upload-button" disabled>Upload
+                                Images</button>
+                        </div>
 
-                <label for="subtitle">Subtitle:</label>
-                <input type="text" id="subtitle" name="subtitle"><br>
+                    </div>
+                </div>
 
-                <label for="kicker">Kicker:</label>
-                <input type="text" id="kicker" name="kicker"><br>
+                <div class="mb-4">
+                    <label for="authors" class="block text-gray-700  dark:text-white text-sm mb-2">Authors:</label>
+                    <select id="authors" name="authors"
+                        class="block text-black appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                        <option>Select option</option>
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
 
-                <label for="body">Body:</label>
-                <textarea id="body" name="body"></textarea><br>
+                <div class="mb-4">
+                    <label for="tags" class="block text-gray-700  dark:text-white text-sm mb-2">Tags:</label>
+                    <select id="tags" name="tags"
+                        class="block text-black appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+                        <option>Select option</option>
+                        <option>Option 1</option>
+                        <option>Option 2</option>
+                        <option>Option 3</option>
+                    </select>
+                </div>
 
-                <label for="description">Description:</label>
-                <textarea id="description" name="description"></textarea><br>
+                <div class="mb-4">
+                    <label for="url" class="block text-gray-700 dark:text-white text-sm mb-2">Permalink:</label>
+                    <input type="text" id="url" name="url"
+                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                        placeholder="relative path of the post" required>
+                </div>
 
-                <label for="keywords">Keywords:</label>
-                <input type="text" id="keywords" name="keywords"><br>
+                <input type="hidden" id="schema" value="{{schema}}">
 
-                <label for="tldr">TLDR:</label>
-                <textarea id="tldr" name="tldr"></textarea><br>
-
-                <label for="timestamp">Timestamp:</label>
-                <input type="date" id="timestamp" name="timestamp"><br>
-
-                <label for="hero_image_url">Hero Image URL:</label>
-                <input type="text" id="hero_image_url" name="hero_image_url"><br>
-
-                <label for="authors">Authors (comma-separated):</label>
-                <input type="text" id="authors" name="authors"><br>
-
-                <label for="tags">Tags (comma-separated):</label>
-                <input type="text" id="tags" name="tags"><br>
-
-                <button type="submit">Submit</button>
+                <div class="flex justify-end">
+                    <button type="submit" id="submit-button" class="button-flashy w-[96]" data-url="/admin/tag">
+                        Submit
+                    </button>
+                </div>
             </form>
-            <div id="errors" class="error"></div>
+            <div id="errors" class="bg-yellow-100 text-black p-2 hidden">
+            </div>
+        </section>
+        <section class="col-auto">
 
-        </main>
-
-    </body>
-
-</html>
+        </section>
+    </div>
+    <script type="module" src="/assets/scripts/post.js"></script>
+{{/admin-main}}

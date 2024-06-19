@@ -32,7 +32,7 @@ pub async fn get_author_list(
     mongoc: web::Data<Client>,
 ) -> impl Responder {
     match db_ops::Database
-        .get_all::<AuthorEntity>(&mongoc, "authors")
+        .find_all::<AuthorEntity>(&mongoc, "authors")
         .await
     {
         EntityResult::Success(r) => {
@@ -78,7 +78,7 @@ pub async fn get_edit_author(
         }
         EntityResult::Error(e) => {
             error!("Failed to find author: {:?}", e);
-            HttpResponse::InternalServerError().body("Error finding author")
+            HttpResponse::BadRequest().body("Error finding author")
         }
     }
 }
@@ -105,13 +105,13 @@ pub async fn post_create_author(
                 }
                 EntityResult::Error(e) => {
                     error!("Failed to create author: {:?}", e);
-                    HttpResponse::InternalServerError().body("Error creating author")
+                    HttpResponse::BadRequest().body("Error creating author")
                 }
             }
         }
         JsonOpsResult::Error(e) => {
             error!("Failed to validate author: {:?}", e);
-            HttpResponse::InternalServerError().body("Error validating author")
+            HttpResponse::BadRequest().body("Error validating author")
         }
     }
 }
@@ -140,13 +140,13 @@ pub async fn post_edit_author(
                 }
                 EntityResult::Error(e) => {
                     error!("Failed to update author: {:?}", e);
-                    HttpResponse::InternalServerError().body("Error updating author")
+                    HttpResponse::BadRequest().body("Error updating author")
                 }
             }
         }
         JsonOpsResult::Error(e) => {
             error!("Failed to validate author: {:?}", e);
-            HttpResponse::InternalServerError().body("Error validating author")
+            HttpResponse::BadRequest().body("Error validating author")
         }
     }
 }

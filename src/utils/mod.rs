@@ -1,3 +1,4 @@
+pub mod date_ops;
 pub mod db_ops;
 pub mod environ;
 pub mod file_ops;

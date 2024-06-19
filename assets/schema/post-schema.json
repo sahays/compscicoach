@@ -5,11 +5,10 @@
 		"_id": {
 			"type": "string",
 			"pattern": "^[0-9a-fA-F]{24}$",
-			"maxLength": 24
+			"maxLength": 23
 		},
 		"url": {
 			"type": "string",
-			"format": "uri",
 			"minLength": 1,
 			"maxLength": 511
 		},
@@ -31,12 +30,12 @@
 		"body": {
 			"type": "string",
 			"minLength": 1,
-			"maxLength": 8191
+			"maxLength": 81911
 		},
 		"description": {
 			"type": "string",
 			"minLength": 1,
-			"maxLength": 511
+			"maxLength": 1023
 		},
 		"keywords": {
 			"type": "string",
@@ -56,7 +55,7 @@
 			"type": "string",
 			"format": "uri",
 			"minLength": 1,
-			"maxLength": 1024
+			"maxLength": 1023
 		},
 		"authors": {
 			"type": "array",

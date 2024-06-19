@@ -31,7 +31,7 @@ pub async fn get_tag_list(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    match db_ops::Database.get_all::<TagEntity>(&mongoc, "tags").await {
+    match db_ops::Database.find_all::<TagEntity>(&mongoc, "tags").await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -75,7 +75,7 @@ pub async fn get_edit_tag(
         }
         EntityResult::Error(e) => {
             error!("Failed to find tag: {:?}", e);
-            HttpResponse::InternalServerError().body("Error finding tag")
+            HttpResponse::BadRequest().body("Error finding tag")
         }
     }
 }
@@ -99,13 +99,13 @@ pub async fn post_create_tag(
                 }
                 EntityResult::Error(e) => {
                     error!("Failed to create tag: {:?}", e);
-                    HttpResponse::InternalServerError().body("Error creating tag")
+                    HttpResponse::BadRequest().body("Error creating tag")
                 }
             }
         }
         JsonOpsResult::Error(e) => {
             error!("Failed to validate tag: {:?}", e);
-            HttpResponse::InternalServerError().body("Error validating tag")
+            HttpResponse::BadRequest().body("Error validating tag")
         }
     }
 }
@@ -134,13 +134,13 @@ pub async fn post_edit_tag(
                 }
                 EntityResult::Error(e) => {
                     error!("Failed to update tag: {:?}", e);
-                    HttpResponse::InternalServerError().body("Error updating tag")
+                    HttpResponse::BadRequest().body("Error updating tag")
                 }
             }
         }
         JsonOpsResult::Error(e) => {
             error!("Failed to validate tag: {:?}", e);
-            HttpResponse::InternalServerError().body("Error validating tag")
+            HttpResponse::BadRequest().body("Error validating tag")
         }
     }
 }

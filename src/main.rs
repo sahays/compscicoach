@@ -9,7 +9,7 @@ pub mod utils;
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{http, middleware, web, App, HttpServer};
-use api::photo::post_photos;
+use api::photo::{post_photo, post_photos};
 use dotenv::from_filename;
 use handlebars::Handlebars;
 use mongodb::Client;
@@ -19,7 +19,7 @@ use pages::{
             get_author_list, get_create_author, get_edit_author, post_create_author,
             post_edit_author,
         },
-        post::{get_create_blog, post_create_post},
+        post::{get_create_post, post_create_post},
         tag::{get_create_tag, get_edit_tag, get_tag_list, post_create_tag, post_edit_tag},
     },
     index::blogs::get_posts,
@@ -80,7 +80,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(mongoc.clone()))
             .service(fs::Files::new("/assets", "./assets").show_files_listing())
             .service(get_posts)
-            .service(get_create_blog)
+            .service(get_create_post)
             .service(post_create_post)
             .service(get_create_author)
             .service(post_create_author)
@@ -89,6 +89,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_tag_list)
             .service(get_edit_tag)
             .service(post_edit_tag)
+            .service(post_photo)
             .service(post_photos)
             .service(get_author_list)
             .service(get_edit_author)

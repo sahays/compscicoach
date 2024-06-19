@@ -3,6 +3,10 @@ use mongodb::bson::{doc, oid::ObjectId};
 
 use serde::{Deserialize, Serialize};
 
+use crate::utils::date_ops;
+
+use super::image::ImagePath;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TagEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -15,10 +19,11 @@ pub struct TagEntity {
 pub struct AuthorEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
-    pub name: String,
+    pub first_name: String,
+    pub last_name: String,
     pub email: String,
     pub bio: String,
-    pub photo_url: String,
+    pub photo_url: ImagePath,
     pub intro: String,
 }
 
@@ -26,7 +31,7 @@ pub struct AuthorEntity {
 pub struct PostEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
-    pub url: String,
+    pub permalink: String,
     pub title: String,
     pub subtitle: String,
     pub kicker: String,
@@ -34,41 +39,11 @@ pub struct PostEntity {
     pub description: String,
     pub keywords: String,
     pub tldr: String,
-    pub timestamp: NaiveDate,
-    pub hero_image_url: String,
+    pub publish_date: NaiveDate,
+    pub modified_date: Option<NaiveDate>,
+    pub hero_image: ImagePath,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TagQueryModel {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AuthorQueryModel {
-    pub id: String,
-    pub name: String,
-    pub email: String,
-    pub bio: String,
-    pub photo_url: String,
-    pub intro: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PostQueryModel {
-    pub id: String,
-    pub url: String,
-    pub title: String,
-    pub body: String,
-    pub description: String,
-    pub keywords: String,
-    pub tldr: String,
-    pub subtitle: String,
-    pub hero_image_url: String,
-    pub timestamp: NaiveDate,
 }
 
 impl TagEntity {
@@ -91,11 +66,12 @@ impl AuthorEntity {
     fn new() -> Self {
         AuthorEntity {
             _id: None,
-            name: "not-set".to_string(),
+            first_name: "not-set".to_string(),
             email: "not-set".to_string(),
             bio: "not-set".to_string(),
-            photo_url: "not-set".to_string(),
+            photo_url: ImagePath::new("not-set".to_string(), "not-set".to_string()),
             intro: "not-set".to_string(),
+            last_name: "not-set".to_string(),
         }
     }
 }
@@ -109,19 +85,20 @@ impl Default for AuthorEntity {
 impl PostEntity {
     fn new() -> Self {
         PostEntity {
-            url: "not-set".to_string(),
+            _id: None,
+            permalink: "not-set".to_string(),
             title: "not-set".to_string(),
+            subtitle: "not-set".to_string(),
+            kicker: "not-set".to_string(),
             body: "not-set".to_string(),
             description: "not-set".to_string(),
             keywords: "not-set".to_string(),
             tldr: "not-set".to_string(),
-            timestamp: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
-            hero_image_url: "not-set".to_string(),
-            subtitle: "not-set".to_string(),
-            _id: None,
-            authors: vec![],
-            tags: vec![],
-            kicker: "not-set".to_string(),
+            publish_date: date_ops::local_date(),
+            modified_date: None,
+            hero_image: ImagePath::new("not-set".to_string(), "not-set".to_string()),
+            authors: vec!["not-set".to_string()],
+            tags: vec!["not-set".to_string()],
         }
     }
 }
