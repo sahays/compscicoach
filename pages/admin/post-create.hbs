@@ -1,60 +1,51 @@
 {{#> admin-main}}
     <div class="grid grid-cols-12 w-full gap-2">
-        <section class="col-span-12">
-            <form id="userForm">
+        <section class="col-span-8">
+            <form id="userForm" class="w-[360px] md:w-[540px] xl:w-[760px]">
                 <h1 class="text-3xl mb-6 text-gray-800 dark:text-white">Add a New Post</h1>
                 <div class="mb-4">
                     <label for="title" class="block text-gray-700 dark:text-white text-sm mb-2">Title:</label>
-                    <input type="text" id="title" name="title"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="a clickworthy title of the post" required>
+                    <input type="text" id="title" name="title" placeholder="a clickworthy title of the post" required>
                 </div>
                 <div class="mb-4">
                     <label for="subtitle" class="block text-gray-700 dark:text-white text-sm mb-2">Subtitle:</label>
-                    <input type="text" id="subtitle" name="subtitle"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="a sneak peek of the post" required>
+                    <input type="text" id="subtitle" name="subtitle" placeholder="a sneak peek of the post" required>
                 </div>
                 <div class="mb-4">
                     <label for="kicker" class="block text-gray-700 dark:text-white text-sm mb-2">Kicker:</label>
-                    <input type="text" id="kicker" name="kicker"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="punch line of the post" required>
+                    <input type="text" id="kicker" name="kicker" placeholder="punch line of the post" required>
                 </div>
                 <div class="mb-4">
                     <label for="body" class="block text-gray-700  dark:text-white text-sm mb-2">Body:</label>
-                    <textarea id="body" name="body"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        rows="25" placeholder="the most engaging and informational part of the post (use markdown)"
+                    <textarea id="body" name="body" rows="25"
+                        placeholder="the most engaging and informational part of the post (use markdown)"
                         required></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="description"
                         class="block text-gray-700  dark:text-white text-sm mb-2">Description:</label>
-                    <textarea id="description" name="description"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        rows="5" placeholder="post description goes in the page header for SEO" required></textarea>
+                    <textarea id="description" name="description" rows=" 5"
+                        placeholder="post description goes in the page header for SEO" required></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="keywords" class="block text-gray-700  dark:text-white text-sm mb-2">Keywords:</label>
-                    <textarea id="keywords" name="keywords"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        rows="5" placeholder="keywords from the post body" required></textarea>
+                    <textarea id="keywords" name="keywords" rows="5" placeholder="keywords from the post body"
+                        required></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="tldr" class="block text-gray-700  dark:text-white text-sm mb-2">TL;DR:</label>
-                    <textarea id="tldr" name="tldr"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        rows="5" placeholder="key takeaways or a concise summary of the post" required></textarea>
+                    <textarea id="tldr" name="tldr" rows="5"
+                        placeholder="key takeaways or a concise summary of the post" required></textarea>
                 </div>
                 <input type="hidden" id="timestamp" value="{{timestamp}}">
 
                 <div class="mb-4">
                     <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">Hero Image (wide
                         aspect ratio):</label>
-                    <div class="flex-row md:flex items-baseline">
-                        <input type="file" id="photo-field" name="photo-field" class="mb-4" accept=".jpg,.jpeg" />
-                        <div class="flex md:justify-end w-full">
+                    <div class="flex-row md:flex items-baseline gap-4">
+                        <input type="file" id="photo-field" name="photo-field" class="mb-4 flex-1"
+                            accept=".jpg,.jpeg" />
+                        <div class="flex md:justify-end">
                             <button type="button" id="upload-button" disabled data-url="/api/photo">Upload
                                 Image</button>
                         </div>
@@ -73,10 +64,10 @@
                 <div class="mb-4">
                     <label for="more-photos-field" class="block text-gray-700 dark:text-white text-sm mb-2">More
                         Images:</label>
-                    <div class="flex-row md:flex items-baseline">
-                        <input type="file" id="more-photos-field" name="more-photos-field" class="mb-4"
+                    <div class="flex-row md:flex items-baseline gap-4">
+                        <input type="file" id="more-photos-field" name="more-photos-field" class="mb-4 flex-1"
                             accept=".jpg,.jpeg" multiple />
-                        <div class="flex md:justify-end w-full">
+                        <div class="flex md:justify-end">
                             <button type="button" id="more-photos-upload-button" disabled data-url="/api/photos">Upload
                                 Images</button>
                         </div>
@@ -88,48 +79,42 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="authors" class="block text-gray-700  dark:text-white text-sm mb-2">Authors:</label>
-                    <select id="authors" name="authors"
-                        class="block text-black appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                        <option>Select option</option>
-                        <option>Option 1</option>
-                        <option>Option 2</option>
-                        <option>Option 3</option>
-                    </select>
+                <div class="flex gap-4">
+                    <div class="mb-4 flex-1">
+                        <label for="authors" class="block text-gray-700  dark:text-white text-sm mb-2">Authors:</label>
+                        <select id="authors" name="authors">
+                            {{#each authors}}
+                                <option value="{{id}}">{{first_name}} {{last_name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <div class="mb-4 flex-1">
+                        <label for="tags" class="block text-gray-700  dark:text-white text-sm mb-2">Tags:</label>
+                        <select id="tags" name="tags">
+                            {{#each tags}}
+                                <option value="{{id}}">{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label for="tags" class="block text-gray-700  dark:text-white text-sm mb-2">Tags:</label>
-                    <select id="tags" name="tags"
-                        class="block text-black appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                        <option>Select option</option>
-                        <option>Option 1</option>
-                        <option>Option 2</option>
-                        <option>Option 3</option>
-                    </select>
-                </div>
 
                 <div class="mb-4">
-                    <label for="url" class="block text-gray-700 dark:text-white text-sm mb-2">Permalink:</label>
-                    <input type="text" id="url" name="url"
-                        class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="relative path of the post" required>
+                    <label for="permalink" class="block text-gray-700 dark:text-white text-sm mb-2">Permalink:</label>
+                    <input type="text" id="permalink" name="permalink" placeholder="relative path of the post" required>
                 </div>
 
                 <input type="hidden" id="schema" value="{{schema}}">
 
-                <div class="flex justify-end">
-                    <button type="submit" id="submit-button" class="button-flashy w-[96]" data-url="/admin/post">
+                <div class="flex">
+                    <button type="submit" id="submit-button" class="button-flashy w-64 mx-auto" data-url="/admin/post">
                         Submit
                     </button>
                 </div>
             </form>
             <div id="errors" class="bg-yellow-100 text-black p-2 hidden">
             </div>
-        </section>
-        <section class="col-auto">
-
         </section>
     </div>
     <script type="module" src="/assets/scripts/post.js"></script>

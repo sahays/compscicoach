@@ -1,12 +1,12 @@
 use std::vec;
 
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDateTime};
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-use crate::entities::{
-    blogs::{AuthorEntity, PostEntity, TagEntity},
-    image::ImagePath,
+use crate::{
+    entities::blogs::{AuthorEntity, PostEntity, TagEntity},
+    utils::image_ops::ImagePath,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,7 +26,8 @@ pub struct AuthorResponseModel {
     pub last_name: String,
     pub email: String,
     pub bio: String,
-    pub photo_url: String,
+    pub profile_photo: String,
+    pub thumbnail_photo: String,
     pub intro: String,
 }
 
@@ -45,17 +46,20 @@ pub struct TagResponseModel {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostResponseModel {
+    pub id: String,
+    pub permalink: String,
     pub title: String,
     pub subtitle: String,
+    pub kicker: String,
     pub body: String,
     pub description: String,
     pub keywords: String,
     pub tldr: String,
     pub hero_image: String,
-    pub publish_date: NaiveDate,
-    pub modified_date: Option<NaiveDate>,
-    pub authors: Vec<AuthorResponseModel>,
-    pub tags: Vec<TagResponseModel>,
+    pub publish_date: NaiveDateTime,
+    pub modified_date: Option<NaiveDateTime>,
+    pub author: AuthorResponseModel,
+    pub tag: TagResponseModel,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -68,9 +72,10 @@ pub struct PostRequestModel {
     pub keywords: String,
     pub tldr: String,
     pub hero_image: String,
-    pub publish_date: NaiveDate,
-    pub author: Vec<String>,
-    pub tags: Vec<String>,
+    pub publish_date: i64,
+    pub author: String,
+    pub tag: String,
+    pub permalink: String,
 }
 
 impl AuthorRequestModel {
@@ -88,6 +93,19 @@ impl AuthorRequestModel {
 }
 
 impl AuthorResponseModel {
+    pub fn new() -> Self {
+        AuthorResponseModel {
+            id: "not-set".to_string(),
+            first_name: "not-set".to_string(),
+            last_name: "not-set".to_string(),
+            email: "not-set".to_string(),
+            bio: "not-set".to_string(),
+            profile_photo: "not-set".to_string(),
+            thumbnail_photo: "not-set".to_string(),
+            intro: "not-set".to_string(),
+        }
+    }
+
     pub fn from(entity: AuthorEntity) -> Self {
         AuthorResponseModel {
             id: entity._id.unwrap().to_string(),
@@ -95,7 +113,8 @@ impl AuthorResponseModel {
             last_name: entity.last_name,
             email: entity.email,
             bio: entity.bio,
-            photo_url: entity.photo_url.profile_r_path(),
+            profile_photo: entity.photo_url.profile_r_path(),
+            thumbnail_photo: entity.photo_url.thumbnail_r_path(),
             intro: entity.intro,
         }
     }
@@ -122,6 +141,14 @@ impl TagRequestModel {
 }
 
 impl TagResponseModel {
+    pub fn new() -> Self {
+        TagResponseModel {
+            id: "not-set".to_string(),
+            name: "not-set".to_string(),
+            description: "not-set".to_string(),
+        }
+    }
+
     pub fn from(entity: TagEntity) -> Self {
         TagResponseModel {
             id: entity._id.unwrap().to_string(),
@@ -144,7 +171,10 @@ impl TagResponseModel {
 impl PostResponseModel {
     pub fn from(entity: PostEntity) -> Self {
         PostResponseModel {
+            id: entity._id.unwrap().to_string(),
+            permalink: entity.permalink.to_string(),
             title: entity.title.to_string(),
+            kicker: entity.kicker.to_string(),
             subtitle: entity.subtitle.to_string(),
             body: entity.body.to_string(),
             description: entity.description.to_string(),
@@ -153,8 +183,8 @@ impl PostResponseModel {
             hero_image: entity.hero_image.to_string(),
             publish_date: entity.publish_date,
             modified_date: entity.modified_date,
-            authors: vec![],
-            tags: vec![],
+            author: AuthorResponseModel::new(),
+            tag: TagResponseModel::new(),
         }
     }
 
@@ -176,46 +206,35 @@ impl PostResponseModel {
         let mut post_responses = Vec::new();
 
         for post in posts {
-            let post_authors: Vec<AuthorResponseModel> = post
-                .authors
-                .iter()
-                .filter_map(|author_id| {
-                    authors
-                        .iter()
-                        .find(|author| {
-                            author
-                                ._id
-                                .unwrap()
-                                .eq(&ObjectId::parse_str(author_id).unwrap())
-                        })
-                        .map(|author| AuthorResponseModel {
-                            first_name: author.first_name.clone(),
-                            last_name: author.last_name.clone(),
-                            email: author.email.clone(),
-                            bio: author.bio.clone(),
-                            photo_url: author.photo_url.to_string(),
-                            intro: author.intro.clone(),
-                            id: author._id.unwrap().to_string(),
-                        })
-                })
-                .collect();
+            let post_author = AuthorResponseModel::from(
+                authors
+                    .iter()
+                    .find(|author| {
+                        author
+                            ._id
+                            .unwrap()
+                            .eq(&ObjectId::parse_str(post.author.as_str()).unwrap())
+                    })
+                    .unwrap()
+                    .clone(),
+            );
 
-            let post_tags: Vec<TagResponseModel> = post
-                .tags
-                .iter()
-                .filter_map(|tag_id| {
-                    tags.iter()
-                        .find(|tag| tag._id.unwrap().eq(&ObjectId::parse_str(tag_id).unwrap()))
-                        .map(|tag| TagResponseModel {
-                            name: tag.name.clone(),
-                            description: tag.description.clone(),
-                            id: tag._id.unwrap().to_string(),
-                        })
-                })
-                .collect();
+            let post_tag = TagResponseModel::from(
+                tags.iter()
+                    .find(|tag| {
+                        tag._id
+                            .unwrap()
+                            .eq(&ObjectId::parse_str(post.tag.as_str()).unwrap())
+                    })
+                    .unwrap()
+                    .clone(),
+            );
 
             let post_response = PostResponseModel {
+                id: post._id.unwrap().to_string(),
+                permalink: post.permalink.clone(),
                 title: post.title.clone(),
+                kicker: post.kicker.clone(),
                 subtitle: post.subtitle.clone(),
                 body: post.body.clone(),
                 description: post.description.clone(),
@@ -224,8 +243,8 @@ impl PostResponseModel {
                 hero_image: post.hero_image.to_string(),
                 publish_date: post.publish_date,
                 modified_date: post.modified_date,
-                authors: post_authors,
-                tags: post_tags,
+                author: post_author,
+                tag: post_tag,
             };
 
             post_responses.push(post_response);
@@ -238,7 +257,7 @@ impl PostResponseModel {
 impl PostRequestModel {
     pub fn to(&self) -> PostEntity {
         PostEntity {
-            permalink: "not-set".to_string(),
+            permalink: self.permalink.to_string(),
             title: self.title.to_string(),
             body: self.body.to_string(),
             description: self.description.to_string(),
@@ -247,10 +266,12 @@ impl PostRequestModel {
             hero_image: ImagePath::from_string(self.hero_image.as_str()),
             subtitle: self.subtitle.to_string(),
             _id: None,
-            authors: self.author.clone(),
-            tags: self.tags.clone(),
+            author: self.author.clone(),
+            tag: self.tag.clone(),
             kicker: self.kicker.to_string(),
-            publish_date: self.publish_date,
+            publish_date: DateTime::from_timestamp(self.publish_date, 0)
+                .unwrap()
+                .naive_local(),
             modified_date: None,
         }
     }

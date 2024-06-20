@@ -8,34 +8,30 @@
                     <label class="block text-gray-700 dark:text-white text-sm mb-2">Name:</label>
                     <div class="flex flex-col md:flex-row gap-2">
                         <input type="text" id="first_name" name="first_name" value="{{author.first_name}}"
-                            class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
                             placeholder="given name" required>
                         <input type="text" id="last_name" name="last_name" value="{{author.last_name}}"
-                            class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight"
                             placeholder="family name" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label for="email" class="block text-gray-700 dark:text-white text-sm mb-2">Email:</label>
-                    <input type="email" id="email" name="email" value="{{author.email}}"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="Email" required>
+                    <input type="email" id="email" name="email" value="{{author.email}}" placeholder="Email" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="bio" class="block text-gray-700  dark:text-white text-sm mb-2">Bio:</label>
-                    <textarea id="bio" name="bio" rows="5"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
-                        placeholder="Tell us about yourself (use markdown)" required>{{author.bio}}</textarea>
+                    <textarea id="bio" name="bio" rows="5" placeholder="Tell us about yourself (use markdown)"
+                        required>{{author.bio}}</textarea>
                 </div>
 
                 <div class="mb-4">
                     <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">Upload a
                         Profile Photo</label>
-                    <div class="flex-row md:flex items-baseline">
-                        <input type="file" id="photo-field" name="photo-field" class="mb-4" accept=".jpg,.jpeg" />
-                        <div class="flex md:justify-end w-full">
+                    <div class="flex-row md:flex items-baseline gap-4">
+                        <input type="file" id="photo-field" name="photo-field" class="mb-4 flex-1"
+                            accept=".jpg,.jpeg" />
+                        <div class="flex md:justify-end">
                             <button type="button" id="upload-button" disabled>Upload
                                 photo</button>
                         </div>
@@ -60,8 +56,8 @@
 
                 <input type="hidden" id="schema" value="{{schema}}">
 
-                <div class="flex justify-end">
-                    <button type="submit" id="submit-button" class="button-flashy"
+                <div class="flex">
+                    <button type="submit" id="submit-button" class="button-flashy w-64 mx-auto"
                         data-url="/admin/author/{{author.id}}">
                         Submit
                     </button>

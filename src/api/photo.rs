@@ -6,9 +6,9 @@ use futures::StreamExt;
 use image::{imageops::FilterType, GenericImageView};
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    entities::image::{ImagePath, ImageSize},
-    utils::random_ops,
+use crate::utils::{
+    image_ops::{ImagePath, ImageSize},
+    random_ops,
 };
 
 #[derive(Deserialize, Serialize)]

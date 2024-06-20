@@ -59,7 +59,7 @@ impl fmt::Display for ImageSize {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ImagePath {
     pub key: String,
     pub extension: String,

@@ -10,7 +10,7 @@ use crate::{
         blogs::{AuthorEntity, PostEntity, TagEntity},
         result_types::EntityResult,
     },
-    models::{PostRequestModel, PostResponseModel},
+    models::{AuthorResponseModel, PostRequestModel, PostResponseModel, TagResponseModel},
     utils::{
         db_ops, file_ops,
         json_ops::{self, JsonOpsResult},
@@ -20,13 +20,37 @@ use crate::{
 #[get("/admin/post")]
 pub async fn get_create_post(
     handlebars: web::Data<Handlebars<'_>>,
-    _mongoc: web::Data<Client>,
+    mongoc: web::Data<Client>,
 ) -> impl Responder {
+    let authors = match db_ops::Database
+        .find_all::<AuthorEntity>(&mongoc, "authors")
+        .await
+    {
+        EntityResult::Success(r) => r,
+        EntityResult::Error(e) => {
+            error!("Failed to find authors: {:?}", e);
+            return HttpResponse::InternalServerError().body("Error finding authors");
+        }
+    };
+
+    let tags = match db_ops::Database
+        .find_all::<TagEntity>(&mongoc, "tags")
+        .await
+    {
+        EntityResult::Success(r) => r,
+        EntityResult::Error(e) => {
+            error!("Failed to find tags: {:?}", e);
+            return HttpResponse::InternalServerError().body("Error finding tags");
+        }
+    };
     render_template!(
         handlebars,
         "post-create",
         json!({
             "title": "Add a new Post",
+            "timestamp": chrono::Local::now().timestamp(),
+            "authors": AuthorResponseModel::from_vec(authors),
+            "tags": TagResponseModel::from_vec(tags),
             "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
         })
     )

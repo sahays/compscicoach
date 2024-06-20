@@ -56,7 +56,7 @@ $(function () {
 				data.forEach((photo) => {
 					console.log("Upload successful:", photo);
 					$("#hero-image").attr("src", photo.paths["Hero"]);
-					$("#photo-url").val(photo.paths["Original"]);
+					$("#hero-image-url").val(photo.paths["Original"]);
 					$("#photo-field-info").text(photo.paths["Hero"]);
 				});
 				toggle_form(false);
@@ -125,7 +125,7 @@ $(function () {
 				data.forEach((photo) => {
 					paths.push(photo.paths["Original"]);
 					$("#more-photos-field-info").append(
-						$("<p>").text(photo.paths["Original"])
+						$("<p>").text(photo.paths["Wide"])
 					);
 				});
 				$("#more-photos-url").val(paths.join(","));
@@ -146,12 +146,18 @@ $(function () {
 		event.preventDefault();
 
 		var payload = {
-			// first_name: $("#first_name").val(),
-			// last_name: $("#last_name").val(),
-			// email: $("#email").val(),
-			// bio: $("#bio").val(),
-			// intro: $("#intro").val(),
-			// photo_url: $("#photo-url").val(),
+			title: $("#title").val(),
+			kicker: $("#kicker").val(),
+			subtitle: $("#subtitle").val(),
+			body: $("#body").val(),
+			keywords: $("#keywords").val(),
+			tldr: $("#tldr").val(),
+			hero_image: $("#hero-image-url").val(),
+			publish_date: parseInt($("#timestamp").val()),
+			author: $("#authors").val(),
+			tag: $("#tags").val(),
+			permalink: $("#permalink").val(),
+			description: $("#description").val(),
 		};
 		console.log(payload);
 

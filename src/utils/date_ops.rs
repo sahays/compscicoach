@@ -1,5 +1,5 @@
-use chrono::{Local, NaiveDate};
+use chrono::{Local, NaiveDateTime};
 
-pub fn local_date() -> NaiveDate {
-    Local::now().naive_local().date()
+pub fn local_date() -> NaiveDateTime {
+    Local::now().naive_local()
 }

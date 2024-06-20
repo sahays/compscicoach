@@ -1,13 +1,11 @@
-use chrono::NaiveDate;
+use chrono::NaiveDateTime;
 use mongodb::bson::{doc, oid::ObjectId};
 
 use serde::{Deserialize, Serialize};
 
-use crate::utils::date_ops;
+use crate::utils::{date_ops, image_ops::ImagePath};
 
-use super::image::ImagePath;
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct TagEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
@@ -15,7 +13,7 @@ pub struct TagEntity {
     pub description: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AuthorEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,
@@ -39,11 +37,11 @@ pub struct PostEntity {
     pub description: String,
     pub keywords: String,
     pub tldr: String,
-    pub publish_date: NaiveDate,
-    pub modified_date: Option<NaiveDate>,
+    pub publish_date: NaiveDateTime,
+    pub modified_date: Option<NaiveDateTime>,
     pub hero_image: ImagePath,
-    pub authors: Vec<String>,
-    pub tags: Vec<String>,
+    pub author: String,
+    pub tag: String,
 }
 
 impl TagEntity {
@@ -97,8 +95,8 @@ impl PostEntity {
             publish_date: date_ops::local_date(),
             modified_date: None,
             hero_image: ImagePath::new("not-set".to_string(), "not-set".to_string()),
-            authors: vec!["not-set".to_string()],
-            tags: vec!["not-set".to_string()],
+            author: "not-set".to_string(),
+            tag: "not-set".to_string(),
         }
     }
 }
