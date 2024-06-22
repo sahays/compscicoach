@@ -9,7 +9,8 @@ use crate::{
     entities::{blogs::TagEntity, result_types::EntityResult},
     models::{TagRequestModel, TagResponseModel},
     utils::{
-        db_ops, file_ops,
+        db_ops::{self, Database},
+        file_ops,
         json_ops::{self, JsonOpsResult},
     },
 };
@@ -31,7 +32,8 @@ pub async fn get_tag_list(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    match db_ops::Database.find_all::<TagEntity>(&mongoc, "tags").await {
+    let collection = Database::new(&mongoc, "tags");
+    match db_ops::Database::find_all::<TagEntity>(collection).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -57,10 +59,8 @@ pub async fn get_edit_tag(
     path: web::Path<String>,
 ) -> impl Responder {
     let tag_id = path.into_inner();
-    match db_ops::Database
-        .find::<TagEntity>(&mongoc, "tags", tag_id)
-        .await
-    {
+    let collection = Database::new(&mongoc, "tags");
+    match db_ops::Database::find::<TagEntity>(collection, tag_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -92,7 +92,8 @@ pub async fn post_create_tag(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database.create(&mongoc, "tags", model.to()).await {
+            let collection = Database::new(&mongoc, "tags");
+            match db_ops::Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Tag created {:?}", r);
                     HttpResponse::Ok().body("Tag created")
@@ -124,10 +125,8 @@ pub async fn post_edit_tag(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database
-                .update(&mongoc, "tags", model.to(), tag_id)
-                .await
-            {
+            let collection = Database::new(&mongoc, "tags");
+            match Database::update(collection, model.to(), tag_id).await {
                 EntityResult::Success(r) => {
                     info!("Tag updated {:?}", r);
                     HttpResponse::Ok().body("Tag updated")

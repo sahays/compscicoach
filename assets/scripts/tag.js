@@ -32,6 +32,7 @@ $(function () {
 				success: function (data) {
 					console.log(data);
 					$("#errors").hide();
+					window.location = "/admin/tags";
 				},
 				error: function (err) {
 					console.error(err.responseText);

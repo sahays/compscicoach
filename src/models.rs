@@ -1,12 +1,15 @@
 use std::vec;
 
-use chrono::{DateTime, NaiveDateTime};
-use mongodb::bson::oid::ObjectId;
+use log::error;
+use mongodb::{bson::oid::ObjectId, Collection};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    entities::blogs::{AuthorEntity, PostEntity, TagEntity},
-    utils::image_ops::ImagePath,
+    entities::{
+        blogs::{AuthorEntity, PostEntity, TagEntity},
+        result_types::EntityResult,
+    },
+    utils::{date_ops, db_ops::Database, image_ops::ImagePath},
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,29 +56,29 @@ pub struct PostResponseModel {
     pub kicker: String,
     pub body: String,
     pub description: String,
-    pub keywords: String,
     pub tldr: String,
     pub hero_image: String,
-    pub publish_date: NaiveDateTime,
-    pub modified_date: Option<NaiveDateTime>,
+    pub profile_image: String,
+    pub publish_date: String,
+    pub modified_date: String,
     pub author: AuthorResponseModel,
     pub tag: TagResponseModel,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostRequestModel {
-    pub kicker: String,
+    pub permalink: String,
     pub title: String,
     pub subtitle: String,
+    pub kicker: String,
     pub body: String,
     pub description: String,
-    pub keywords: String,
     pub tldr: String,
     pub hero_image: String,
     pub publish_date: i64,
+    pub modified_date: i64,
     pub author: String,
     pub tag: String,
-    pub permalink: String,
 }
 
 impl AuthorRequestModel {
@@ -92,8 +95,29 @@ impl AuthorRequestModel {
     }
 }
 
-impl AuthorResponseModel {
-    pub fn new() -> Self {
+impl Default for PostResponseModel {
+    fn default() -> Self {
+        PostResponseModel {
+            id: "not-set".to_string(),
+            permalink: "not-set".to_string(),
+            title: "not-set".to_string(),
+            kicker: "not-set".to_string(),
+            subtitle: "not-set".to_string(),
+            body: "not-set".to_string(),
+            description: "not-set".to_string(),
+            tldr: "not-set".to_string(),
+            hero_image: "not-set".to_string(),
+            profile_image: "not-set".to_string(),
+            publish_date: date_ops::local_date().to_string(),
+            modified_date: date_ops::local_date().to_string(),
+            author: AuthorResponseModel::default(),
+            tag: TagResponseModel::default(),
+        }
+    }
+}
+
+impl Default for AuthorResponseModel {
+    fn default() -> Self {
         AuthorResponseModel {
             id: "not-set".to_string(),
             first_name: "not-set".to_string(),
@@ -105,7 +129,9 @@ impl AuthorResponseModel {
             intro: "not-set".to_string(),
         }
     }
+}
 
+impl AuthorResponseModel {
     pub fn from(entity: AuthorEntity) -> Self {
         AuthorResponseModel {
             id: entity._id.unwrap().to_string(),
@@ -140,15 +166,17 @@ impl TagRequestModel {
     }
 }
 
-impl TagResponseModel {
-    pub fn new() -> Self {
+impl Default for TagResponseModel {
+    fn default() -> Self {
         TagResponseModel {
             id: "not-set".to_string(),
             name: "not-set".to_string(),
             description: "not-set".to_string(),
         }
     }
+}
 
+impl TagResponseModel {
     pub fn from(entity: TagEntity) -> Self {
         TagResponseModel {
             id: entity._id.unwrap().to_string(),
@@ -178,13 +206,13 @@ impl PostResponseModel {
             subtitle: entity.subtitle.to_string(),
             body: entity.body.to_string(),
             description: entity.description.to_string(),
-            keywords: entity.keywords.to_string(),
             tldr: entity.tldr.to_string(),
-            hero_image: entity.hero_image.to_string(),
-            publish_date: entity.publish_date,
-            modified_date: entity.modified_date,
-            author: AuthorResponseModel::new(),
-            tag: TagResponseModel::new(),
+            hero_image: entity.hero_image.hero_r_path(),
+            profile_image: entity.hero_image.profile_r_path(),
+            publish_date: date_ops::to_local_date(entity.publish_date).to_string(),
+            modified_date: date_ops::to_local_date(entity.modified_date).to_string(),
+            author: AuthorResponseModel::default(),
+            tag: TagResponseModel::default(),
         }
     }
 
@@ -196,6 +224,16 @@ impl PostResponseModel {
         }
 
         posts
+    }
+
+    pub async fn from_permalink(permalink: String, collection: Collection<PostEntity>) -> Self {
+        match Database::find_by(collection, String::from("permalink"), permalink).await {
+            EntityResult::Success(r) => PostResponseModel::from(r),
+            EntityResult::Error(e) => {
+                error!("Failed to find post by permalink: {:?}", e);
+                PostResponseModel::default()
+            }
+        }
     }
 
     pub fn all(
@@ -238,11 +276,11 @@ impl PostResponseModel {
                 subtitle: post.subtitle.clone(),
                 body: post.body.clone(),
                 description: post.description.clone(),
-                keywords: post.keywords.clone(),
                 tldr: post.tldr.clone(),
-                hero_image: post.hero_image.to_string(),
-                publish_date: post.publish_date,
-                modified_date: post.modified_date,
+                hero_image: post.hero_image.hero_r_path(),
+                profile_image: post.hero_image.profile_r_path(),
+                publish_date: date_ops::to_local_date(post.publish_date).to_string(),
+                modified_date: date_ops::to_local_date(post.modified_date).to_string(),
                 author: post_author,
                 tag: post_tag,
             };
@@ -251,6 +289,42 @@ impl PostResponseModel {
         }
 
         post_responses
+    }
+
+    pub fn combine(entity: PostEntity, authors: Vec<AuthorEntity>, tags: Vec<TagEntity>) -> Self {
+        PostResponseModel {
+            id: entity._id.unwrap().to_string(),
+            permalink: entity.permalink.to_string(),
+            title: entity.title.to_string(),
+            kicker: entity.kicker.to_string(),
+            subtitle: entity.subtitle.to_string(),
+            body: entity.body.to_string(),
+            description: entity.description.to_string(),
+            tldr: entity.tldr.to_string(),
+            hero_image: entity.hero_image.hero_r_path(),
+            profile_image: entity.hero_image.profile_r_path(),
+            publish_date: date_ops::to_local_date(entity.publish_date).to_string(),
+            modified_date: date_ops::to_local_date(entity.modified_date).to_string(),
+            author: authors
+                .iter()
+                .find(|author| {
+                    author
+                        ._id
+                        .unwrap()
+                        .eq(&ObjectId::parse_str(entity.author.as_str()).unwrap())
+                })
+                .map(|author| AuthorResponseModel::from(author.clone()))
+                .unwrap(),
+            tag: tags
+                .iter()
+                .find(|tag| {
+                    tag._id
+                        .unwrap()
+                        .eq(&ObjectId::parse_str(entity.tag.as_str()).unwrap())
+                })
+                .map(|tag| TagResponseModel::from(tag.clone()))
+                .unwrap(),
+        }
     }
 }
 
@@ -261,7 +335,6 @@ impl PostRequestModel {
             title: self.title.to_string(),
             body: self.body.to_string(),
             description: self.description.to_string(),
-            keywords: self.keywords.to_string(),
             tldr: self.tldr.to_string(),
             hero_image: ImagePath::from_string(self.hero_image.as_str()),
             subtitle: self.subtitle.to_string(),
@@ -269,10 +342,8 @@ impl PostRequestModel {
             author: self.author.clone(),
             tag: self.tag.clone(),
             kicker: self.kicker.to_string(),
-            publish_date: DateTime::from_timestamp(self.publish_date, 0)
-                .unwrap()
-                .naive_local(),
-            modified_date: None,
+            publish_date: date_ops::from(self.publish_date),
+            modified_date: date_ops::from(self.modified_date),
         }
     }
 }

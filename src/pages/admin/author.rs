@@ -9,7 +9,8 @@ use crate::{
     entities::{blogs::AuthorEntity, result_types::EntityResult},
     models::{AuthorRequestModel, AuthorResponseModel},
     utils::{
-        db_ops, file_ops,
+        db_ops::Database,
+        file_ops,
         json_ops::{self, JsonOpsResult},
     },
 };
@@ -31,10 +32,8 @@ pub async fn get_author_list(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    match db_ops::Database
-        .find_all::<AuthorEntity>(&mongoc, "authors")
-        .await
-    {
+    let collection = Database::new(&mongoc, "authors");
+    match Database::find_all::<AuthorEntity>(collection).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -60,10 +59,8 @@ pub async fn get_edit_author(
     path: web::Path<String>,
 ) -> impl Responder {
     let author_id = path.into_inner();
-    match db_ops::Database
-        .find::<AuthorEntity>(&mongoc, "authors", author_id)
-        .await
-    {
+    let collection = Database::new(&mongoc, "authors");
+    match Database::find::<AuthorEntity>(collection, author_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -95,10 +92,8 @@ pub async fn post_create_author(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database
-                .create(&mongoc, "authors", model.to())
-                .await
-            {
+            let collection = Database::new(&mongoc, "authors");
+            match Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Author created {:?}", r);
                     HttpResponse::Ok().body("Author created")
@@ -130,10 +125,8 @@ pub async fn post_edit_author(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database
-                .update(&mongoc, "authors", model.to(), author_id)
-                .await
-            {
+            let collection = Database::new(&mongoc, "authors");
+            match Database::update(collection, model.to(), author_id).await {
                 EntityResult::Success(r) => {
                     info!("Author updated {:?}", r);
                     HttpResponse::Ok().body("Author updated")

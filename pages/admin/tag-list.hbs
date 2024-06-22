@@ -3,6 +3,11 @@
         <a href="/admin/tag" class="button-flashy text-center">Add New Tag</a>
     </div>
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {{#unless tags}}
+            <div class="text-gray-400">
+                No tags found.
+            </div>
+        {{/unless}}
         {{#each tags}}
             <div
                 class="max-w-sm rounded overflow-hidden shadow-lg bg-gray-800 text-white flex flex-col justify-between">

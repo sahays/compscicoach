@@ -14,6 +14,16 @@ $(function () {
 	let toggle_more_upload = function (toggle) {
 		$("#more-photos-upload-button").prop("disabled", toggle);
 	};
+	let tagId = $("#tag-id");
+	let authorId = $("#author-id");
+	if (tagId) {
+		$("#tags").val(tagId.val());
+		console.log("Tag ID:", tagId.val());
+	}
+	if (authorId) {
+		$("#authors").val(authorId.val());
+		console.log("Author ID:", authorId.val());
+	}
 	$("#photo-field").on("change", function () {
 		var file = this.files[0];
 		console.info("File selected:", file.name);
@@ -153,7 +163,10 @@ $(function () {
 			keywords: $("#keywords").val(),
 			tldr: $("#tldr").val(),
 			hero_image: $("#hero-image-url").val(),
-			publish_date: parseInt($("#timestamp").val()),
+			publish_date: parseInt($("#publish_timestamp").val()),
+			modified_date: $("#modified_timestamp")
+				? parseInt($("#modified_timestamp").val())
+				: undefined,
 			author: $("#authors").val(),
 			tag: $("#tags").val(),
 			permalink: $("#permalink").val(),
@@ -182,7 +195,7 @@ $(function () {
 				success: function (data) {
 					console.log(data);
 					$("#errors").hide();
-					window.location.href = "/admin/authors";
+					window.location.href = "/admin/posts";
 				},
 				error: function (err) {
 					console.error(err.responseText);

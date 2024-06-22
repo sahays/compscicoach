@@ -26,17 +26,12 @@
 		"description": {
 			"type": "string",
 			"minLength": 1,
-			"maxLength": 511
-		},
-		"keywords": {
-			"type": "string",
-			"minLength": 1,
-			"maxLength": 511
+			"maxLength": 160
 		},
 		"tldr": {
 			"type": "string",
 			"minLength": 1,
-			"maxLength": 511
+			"maxLength": 255
 		},
 		"hero_image": {
 			"type": "string",
@@ -68,7 +63,6 @@
 		"subtitle",
 		"body",
 		"description",
-		"keywords",
 		"tldr",
 		"hero_image",
 		"publish_date",

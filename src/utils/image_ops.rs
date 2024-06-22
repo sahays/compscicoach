@@ -19,8 +19,8 @@ pub enum ImageSize {
 impl ImageSize {
     pub fn dimensions(&self) -> (u32, u32) {
         match self {
-            ImageSize::Thumbnail => (150, 150),
-            ImageSize::Profile => (300, 300),
+            ImageSize::Thumbnail => (256, 256),
+            ImageSize::Profile => (640, 640 * 9 / 16),
             ImageSize::Wide => (800, 800 * 9 / 16),
             ImageSize::Hero => (1260, 1260 * 9 / 16),
             ImageSize::Original => (0, 0),

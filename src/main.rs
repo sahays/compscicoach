@@ -19,10 +19,10 @@ use pages::{
             get_author_list, get_create_author, get_edit_author, post_create_author,
             post_edit_author,
         },
-        post::{get_create_post, post_create_post},
+        post::{get_create_post, get_edit_post, get_post_list, post_create_post, post_edit_post},
         tag::{get_create_tag, get_edit_tag, get_tag_list, post_create_tag, post_edit_tag},
     },
-    index::blogs::get_posts,
+    blogs::{get_post, get_posts},
 };
 use utils::{environ::Environ, file_ops::read_files_from_dir};
 
@@ -94,6 +94,10 @@ async fn main() -> std::io::Result<()> {
             .service(get_author_list)
             .service(get_edit_author)
             .service(post_edit_author)
+            .service(get_post_list)
+            .service(get_edit_post)
+            .service(post_edit_post)
+            .service(get_post)
     })
     .bind((ip, port))?
     .run()

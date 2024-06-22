@@ -5,15 +5,18 @@
                 <h1 class="text-3xl mb-6 text-gray-800 dark:text-white">Add a New Post</h1>
                 <div class="mb-4">
                     <label for="title" class="block text-gray-700 dark:text-white text-sm mb-2">Title:</label>
-                    <input type="text" id="title" name="title" placeholder="a clickworthy title of the post" required>
+                    <input type="text" id="title" name="title" placeholder="a clickworthy title of the post"
+                        maxlength="255" required>
                 </div>
                 <div class="mb-4">
                     <label for="subtitle" class="block text-gray-700 dark:text-white text-sm mb-2">Subtitle:</label>
-                    <input type="text" id="subtitle" name="subtitle" placeholder="a sneak peek of the post" required>
+                    <input type="text" id="subtitle" name="subtitle" placeholder="a sneak peek of the post"
+                        maxlength="255" required>
                 </div>
                 <div class="mb-4">
                     <label for="kicker" class="block text-gray-700 dark:text-white text-sm mb-2">Kicker:</label>
-                    <input type="text" id="kicker" name="kicker" placeholder="punch line of the post" required>
+                    <input type="text" id="kicker" name="kicker" placeholder="punch line of the post" required
+                        maxlength="255">
                 </div>
                 <div class="mb-4">
                     <label for="body" class="block text-gray-700  dark:text-white text-sm mb-2">Body:</label>
@@ -24,20 +27,17 @@
                 <div class="mb-4">
                     <label for="description"
                         class="block text-gray-700  dark:text-white text-sm mb-2">Description:</label>
-                    <textarea id="description" name="description" rows=" 5"
-                        placeholder="post description goes in the page header for SEO" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="keywords" class="block text-gray-700  dark:text-white text-sm mb-2">Keywords:</label>
-                    <textarea id="keywords" name="keywords" rows="5" placeholder="keywords from the post body"
+                    <textarea id="description" name="description" rows=" 5" maxlength="160"
+                        placeholder="post description goes in the page header for SEO (160 or fewer chars)"
                         required></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="tldr" class="block text-gray-700  dark:text-white text-sm mb-2">TL;DR:</label>
-                    <textarea id="tldr" name="tldr" rows="5"
+                    <textarea id="tldr" name="tldr" rows="5" maxlength="255"
                         placeholder="key takeaways or a concise summary of the post" required></textarea>
                 </div>
-                <input type="hidden" id="timestamp" value="{{timestamp}}">
+                <input type="hidden" id="publish_timestamp" value="{{timestamp}}">
+                <input type="hidden" id="modified_timestamp" value="{{timestamp}}">
 
                 <div class="mb-4">
                     <label for="photo-field" class="block text-gray-700 dark:text-white text-sm mb-2">Hero Image (wide
@@ -102,7 +102,8 @@
 
                 <div class="mb-4">
                     <label for="permalink" class="block text-gray-700 dark:text-white text-sm mb-2">Permalink:</label>
-                    <input type="text" id="permalink" name="permalink" placeholder="relative path of the post" required>
+                    <input type="text" id="permalink" name="permalink" placeholder="relative path of the post"
+                        maxlength="255" required>
                 </div>
 
                 <input type="hidden" id="schema" value="{{schema}}">

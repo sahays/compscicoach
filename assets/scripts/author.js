@@ -46,11 +46,13 @@ $(function () {
 			processData: false,
 			contentType: false,
 			success: function (data) {
-				console.log("Upload successful:", data);
-				if (data.paths) {
-					$("#profile-photo").attr("src", data.paths["Thumbnail"]);
-					$("#photo-url").val(data.paths["Original"]);
-				}
+				console.log(data);
+				let paths = [];
+				data.forEach((photo) => {
+					console.log("Upload successful:", photo);
+					$("#profile-photo").attr("src", photo.paths["Thumbnail"]);
+					$("#photo-url").val(photo.paths["Original"]);
+				});
 				toggle_form(false);
 				toggle_upload(true);
 			},

@@ -5,15 +5,26 @@
                 class="max-w-sm rounded overflow-hidden shadow-lg bg-gray-800 text-white flex flex-col justify-between">
                 <div>
                     <div class="w-full h-64 overflow-hidden">
-                        <img class="object-cover w-full h-full" src="{{hero_image}}" alt="Hero image">
+                        <a href="/blogs/{{permalink}}">
+                            <img class="object-cover w-full h-full" src="{{hero_image}}" alt="Hero image">
+                        </a>
                     </div>
                     <div class="px-6 py-4">
-                        <p class="text-gray-400 text-xs mt-4">{{kicker}}</p>
-                        <div class="font-bold text-xl mb-2">{{title}}</div>
-                        <p class="text-gray-400 font-bold text-sm">{{subtitle}}</p>
+                        <p class="text-sm gradient-text font-semibold">{{tag.name}}</p>
+                        <p class="text-gray-400 text-xs mt-2">{{kicker}}</p>
+                        <a href="/blogs/{{permalink}}">
+                            <div class="font-bold text-xl mb-2">{{title}}</div>
+                        </a>
+                        <p class="text-gray-400 font-semibold text-sm">{{subtitle}}</p>
+                        <div class="flex items-center mt-4 gap-4">
+                            <img src="{{author.thumbnail_photo}}" alt="Author"
+                                class="w-8 h-8 rounded-full inline-block">
+                            <p class="text-sm text-gray-300">{{author.first_name}} {{author.last_name}}</p>
+                        </div>
                     </div>
-                    <!-- authors list -->
-                    <!-- tags list -->
+
+
+
                 </div>
                 <div class="px-6 mt-4 mb-4">
                     <a href="/admin/post/{{id}}"

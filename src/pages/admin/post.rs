@@ -12,7 +12,9 @@ use crate::{
     },
     models::{AuthorResponseModel, PostRequestModel, PostResponseModel, TagResponseModel},
     utils::{
-        db_ops, file_ops,
+        date_ops,
+        db_ops::Database,
+        file_ops,
         json_ops::{self, JsonOpsResult},
     },
 };
@@ -22,10 +24,8 @@ pub async fn get_create_post(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    let authors = match db_ops::Database
-        .find_all::<AuthorEntity>(&mongoc, "authors")
-        .await
-    {
+    let authors_collection = Database::new(&mongoc, "authors");
+    let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
             error!("Failed to find authors: {:?}", e);
@@ -33,10 +33,8 @@ pub async fn get_create_post(
         }
     };
 
-    let tags = match db_ops::Database
-        .find_all::<TagEntity>(&mongoc, "tags")
-        .await
-    {
+    let tags_collection = Database::new(&mongoc, "tags");
+    let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
             error!("Failed to find tags: {:?}", e);
@@ -68,7 +66,8 @@ pub async fn post_create_post(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database.create(&mongoc, "posts", model.to()).await {
+            let collection = Database::new(&mongoc, "posts");
+            match Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Post created {:?}", r);
                     HttpResponse::Ok().body("Post created")
@@ -92,10 +91,8 @@ pub async fn get_post_list(
     mongoc: web::Data<Client>,
 ) -> impl Responder {
     // get all posts
-    let posts = match db_ops::Database
-        .find_all::<PostEntity>(&mongoc, "posts")
-        .await
-    {
+    let collection = Database::new(&mongoc, "posts");
+    let posts = match Database::find_all::<PostEntity>(collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
             error!("Failed to find posts: {:?}", e);
@@ -103,10 +100,8 @@ pub async fn get_post_list(
         }
     };
 
-    let authors = match db_ops::Database
-        .find_all::<AuthorEntity>(&mongoc, "authors")
-        .await
-    {
+    let authors_collection = Database::new(&mongoc, "authors");
+    let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
             error!("Failed to find authors: {:?}", e);
@@ -114,10 +109,8 @@ pub async fn get_post_list(
         }
     };
 
-    let tags = match db_ops::Database
-        .find_all::<TagEntity>(&mongoc, "tags")
-        .await
-    {
+    let tags_collection = Database::new(&mongoc, "tags");
+    let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
             error!("Failed to find tags: {:?}", e);
@@ -144,10 +137,26 @@ pub async fn get_edit_post(
     path: web::Path<String>,
 ) -> impl Responder {
     let post_id = path.into_inner();
-    match db_ops::Database
-        .find::<PostEntity>(&mongoc, "posts", post_id)
-        .await
-    {
+    let authors_collection = Database::new(&mongoc, "authors");
+    let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
+        EntityResult::Success(r) => r,
+        EntityResult::Error(e) => {
+            error!("Failed to find authors: {:?}", e);
+            return HttpResponse::InternalServerError().body("Error finding authors");
+        }
+    };
+
+    let tags_collection = Database::new(&mongoc, "tags");
+    let tags = match Database::find_all::<TagEntity>(tags_collection).await {
+        EntityResult::Success(r) => r,
+        EntityResult::Error(e) => {
+            error!("Failed to find tags: {:?}", e);
+            return HttpResponse::InternalServerError().body("Error finding tags");
+        }
+    };
+
+    let collection = Database::new(&mongoc, "posts");
+    match Database::find::<PostEntity>(collection, post_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
             render_template!(
@@ -155,7 +164,10 @@ pub async fn get_edit_post(
                 "post-edit",
                 json!({
                     "title": "Edit Post",
-                    "post": PostResponseModel::from(r),
+                    "post": PostResponseModel::combine(r, authors.clone(), tags.clone()),
+                    "authors": AuthorResponseModel::from_vec(authors.clone()),
+                    "tags": TagResponseModel::from_vec(tags.clone()),
+                    "timestamp": date_ops::to_timestamp(),
                     "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
                 })
             )
@@ -181,10 +193,8 @@ pub async fn post_edit_post(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            match db_ops::Database
-                .update(&mongoc, "posts", model.to(), post_id)
-                .await
-            {
+            let collection = Database::new(&mongoc, "posts");
+            match Database::update(collection, model.to(), post_id).await {
                 EntityResult::Success(r) => {
                     info!("Post updated {:?}", r);
                     HttpResponse::Ok().body("Post updated")

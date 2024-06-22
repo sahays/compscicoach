@@ -67,7 +67,7 @@
 	}
 	input,
 	textarea {
-		@apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+		@apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:caret-white;
 	}
 	select {
 		@apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
@@ -79,7 +79,7 @@
 		@apply bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text;
 	}
 	.container-default {
-		@apply container max-w-[1024px] xl:max-w-[1280px] mx-auto;
+		@apply container max-w-[840px] xl:max-w-[1024px] mx-auto;
 	}
 	.growable {
 		@apply transition-transform duration-300 ease-in-out transform hover:scale-105;
