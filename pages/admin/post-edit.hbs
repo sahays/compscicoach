@@ -14,15 +14,35 @@
                         value="{{post.subtitle}}" maxlength="255" required>
                 </div>
                 <div class="mb-4">
-                    <label for="kicker" class="block text-gray-700 dark:text-white text-sm mb-2">Kicker:</label>
-                    <input type="text" id="kicker" name="kicker" placeholder="punch line of the post"
-                        value="{{post.kicker}}" maxlength="255" required>
+                    <label for="keywords" class="block text-gray-700 dark:text-white text-sm mb-2">Keywords (comma
+                        separated, max 3):</label>
+                    <input type="text" id="keywords" name="keywords" placeholder="e.g. introduction, basics, advanced"
+                        value="{{post.keywords}}" maxlength="255" required>
                 </div>
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                     <label for="body" class="block text-gray-700  dark:text-white text-sm mb-2">Body:</label>
-                    <textarea id="body" name="body" rows="25"
+                    <textarea id="body" name="body" rows="100" wrap="off"
                         placeholder="the most engaging and informational part of the post (use markdown)"
-                        required>{{post.body}}</textarea>
+                        required>{{{post.body}}}</textarea>
+                </div> -->
+                <div class="mb-4">
+                    <label for="body-field" class="block text-gray-700 dark:text-white text-sm mb-2">Post Body</label>
+                    <p class="my-4 text-sm font-semibold">
+                        <a href="{{body_markdown}}" target="_blank">Download the markdown file</a> to edit the post body
+                    </p>
+                    <div class="flex-row md:flex items-baseline gap-4">
+                        <input type="file" id="body-field" name="body-field" class="mb-4 flex-1" accept=".md"
+                            multiple />
+                        <div class="flex md:justify-end">
+                            <button type="button" id="body-upload-button" disabled data-url="/api/files">Upload
+                                Markdown</button>
+                        </div>
+                        <input type="hidden" id="body-url" name="body-url">
+                    </div>
+                    <div id="body-field-info">
+                    </div>
+                    <div id="body-field-error">
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-gray-700  dark:text-white text-sm mb-2">Description (160
@@ -37,7 +57,7 @@
                         placeholder="key takeaways or a concise summary of the post" maxlength="255"
                         required>{{post.tldr}}</textarea>
                 </div>
-                <input type="hidden" id="publish_timestamp" value="{{post.publish_date}}">
+                <input type="hidden" id="publish_timestamp" value="{{published_timestamp}}">
                 <input type="hidden" id="modified_timestamp" value="{{timestamp}}">
 
                 <div class="mb-4">

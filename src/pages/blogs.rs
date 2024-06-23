@@ -12,7 +12,7 @@ use crate::{
         result_types::EntityResult,
     },
     models::PostResponseModel,
-    utils::db_ops::Database,
+    utils::{db_ops::Database, file_ops},
 };
 
 #[get("/")]
@@ -35,7 +35,7 @@ pub async fn get_post(
 ) -> impl Responder {
     let permalink = path.into_inner();
 
-    let authors_collection = Database::new(&mongoc, "authors");
+    let authors_collection = Database::get_collection(&mongoc, "authors");
     let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -44,7 +44,7 @@ pub async fn get_post(
         }
     };
 
-    let tags_collection = Database::new(&mongoc, "tags");
+    let tags_collection = Database::get_collection(&mongoc, "tags");
     let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -53,7 +53,7 @@ pub async fn get_post(
         }
     };
 
-    let collection = Database::new(&mongoc, "posts");
+    let collection = Database::get_collection(&mongoc, "posts");
     let post = match Database::find_by::<PostEntity, String>(
         collection,
         String::from("permalink"),
@@ -69,11 +69,22 @@ pub async fn get_post(
     };
 
     let model = PostResponseModel::combine(post, authors, tags);
-    let parser = Parser::new(&model.body);
+
+    let post_markdown =
+        match file_ops::read_file(format!("./assets/markdowns/{}.md", model.body).as_str()) {
+            Ok(r) => r,
+            Err(e) => {
+                error!("Failed to find post markdown: {:?}", e);
+                return HttpResponse::InternalServerError().body("Error finding post markdown");
+            }
+        };
+
+    let parser = Parser::new(post_markdown.as_str());
     // Allocate a string for the HTML output
     let mut html_output = String::new();
     // Convert markdown to HTML
     html::push_html(&mut html_output, parser);
+
     render_template!(
         handlebars,
         "blog-post",

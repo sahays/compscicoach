@@ -16,12 +16,6 @@ use crate::{
 pub struct Database;
 
 impl Database {
-    pub fn new<T>(client: &Client, collection_name: &str) -> Collection<T> {
-        client
-            .database(Environ::default().db_name.as_str())
-            .collection::<T>(collection_name)
-    }
-
     pub fn get_collection<T>(client: &Client, collection_name: &str) -> Collection<T> {
         client
             .database(Environ::default().db_name.as_str())

@@ -9,7 +9,10 @@ pub mod utils;
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{http, middleware, web, App, HttpServer};
-use api::photo::{post_photo, post_photos};
+use api::{
+    files::post_markdown,
+    photos::{post_photo, post_photos},
+};
 use dotenv::from_filename;
 use handlebars::Handlebars;
 use mongodb::Client;
@@ -91,6 +94,7 @@ async fn main() -> std::io::Result<()> {
             .service(post_edit_tag)
             .service(post_photo)
             .service(post_photos)
+            .service(post_markdown)
             .service(get_author_list)
             .service(get_edit_author)
             .service(post_edit_author)

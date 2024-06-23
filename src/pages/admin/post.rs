@@ -24,7 +24,7 @@ pub async fn get_create_post(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    let authors_collection = Database::new(&mongoc, "authors");
+    let authors_collection = Database::get_collection(&mongoc, "authors");
     let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -33,7 +33,7 @@ pub async fn get_create_post(
         }
     };
 
-    let tags_collection = Database::new(&mongoc, "tags");
+    let tags_collection = Database::get_collection(&mongoc, "tags");
     let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -66,7 +66,7 @@ pub async fn post_create_post(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "posts");
+            let collection = Database::get_collection(&mongoc, "posts");
             match Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Post created {:?}", r);
@@ -91,7 +91,7 @@ pub async fn get_post_list(
     mongoc: web::Data<Client>,
 ) -> impl Responder {
     // get all posts
-    let collection = Database::new(&mongoc, "posts");
+    let collection = Database::get_collection(&mongoc, "posts");
     let posts = match Database::find_all::<PostEntity>(collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -100,7 +100,7 @@ pub async fn get_post_list(
         }
     };
 
-    let authors_collection = Database::new(&mongoc, "authors");
+    let authors_collection = Database::get_collection(&mongoc, "authors");
     let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -109,7 +109,7 @@ pub async fn get_post_list(
         }
     };
 
-    let tags_collection = Database::new(&mongoc, "tags");
+    let tags_collection = Database::get_collection(&mongoc, "tags");
     let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -137,7 +137,7 @@ pub async fn get_edit_post(
     path: web::Path<String>,
 ) -> impl Responder {
     let post_id = path.into_inner();
-    let authors_collection = Database::new(&mongoc, "authors");
+    let authors_collection = Database::get_collection(&mongoc, "authors");
     let authors = match Database::find_all::<AuthorEntity>(authors_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -146,7 +146,7 @@ pub async fn get_edit_post(
         }
     };
 
-    let tags_collection = Database::new(&mongoc, "tags");
+    let tags_collection = Database::get_collection(&mongoc, "tags");
     let tags = match Database::find_all::<TagEntity>(tags_collection).await {
         EntityResult::Success(r) => r,
         EntityResult::Error(e) => {
@@ -155,19 +155,22 @@ pub async fn get_edit_post(
         }
     };
 
-    let collection = Database::new(&mongoc, "posts");
+    let collection = Database::get_collection(&mongoc, "posts");
     match Database::find::<PostEntity>(collection, post_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
+            let post = PostResponseModel::combine(r.clone(), authors.clone(), tags.clone());
             render_template!(
                 handlebars,
                 "post-edit",
                 json!({
                     "title": "Edit Post",
-                    "post": PostResponseModel::combine(r, authors.clone(), tags.clone()),
+                    "post": post,
+                    "body_markdown": format!("/assets/markdowns/{}.md",post.body),
                     "authors": AuthorResponseModel::from_vec(authors.clone()),
                     "tags": TagResponseModel::from_vec(tags.clone()),
                     "timestamp": date_ops::to_timestamp(),
+                    "published_timestamp": date_ops::to_timestamp_from(r.publish_date),
                     "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
                 })
             )
@@ -193,7 +196,7 @@ pub async fn post_edit_post(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "posts");
+            let collection = Database::get_collection(&mongoc, "posts");
             match Database::update(collection, model.to(), post_id).await {
                 EntityResult::Success(r) => {
                     info!("Post updated {:?}", r);

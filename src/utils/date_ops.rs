@@ -13,6 +13,14 @@ pub fn to_local_date(date: NaiveDateTime) -> String {
         .to_string()
 }
 
+pub fn to_timestamp_from(date: NaiveDateTime) -> String {
+    Local
+        .from_local_datetime(&date)
+        .unwrap()
+        .timestamp()
+        .to_string()
+}
+
 pub fn from(timestamp: i64) -> NaiveDateTime {
     DateTime::from_timestamp(timestamp, 0)
         .unwrap()

@@ -6,3 +6,4 @@ pub mod hash_ops;
 pub mod image_ops;
 pub mod json_ops;
 pub mod random_ops;
+pub mod string_ops;

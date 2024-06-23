@@ -32,7 +32,7 @@ pub async fn get_author_list(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    let collection = Database::new(&mongoc, "authors");
+    let collection = Database::get_collection(&mongoc, "authors");
     match Database::find_all::<AuthorEntity>(collection).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
@@ -59,7 +59,7 @@ pub async fn get_edit_author(
     path: web::Path<String>,
 ) -> impl Responder {
     let author_id = path.into_inner();
-    let collection = Database::new(&mongoc, "authors");
+    let collection = Database::get_collection(&mongoc, "authors");
     match Database::find::<AuthorEntity>(collection, author_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
@@ -92,7 +92,7 @@ pub async fn post_create_author(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "authors");
+            let collection = Database::get_collection(&mongoc, "authors");
             match Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Author created {:?}", r);
@@ -125,7 +125,7 @@ pub async fn post_edit_author(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "authors");
+            let collection = Database::get_collection(&mongoc, "authors");
             match Database::update(collection, model.to(), author_id).await {
                 EntityResult::Success(r) => {
                     info!("Author updated {:?}", r);

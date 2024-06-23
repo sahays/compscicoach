@@ -3,7 +3,7 @@
 	"title": "Article",
 	"type": "object",
 	"properties": {
-		"kicker": {
+		"keywords": {
 			"type": "string",
 			"minLength": 1,
 			"maxLength": 255
@@ -58,7 +58,7 @@
 		}
 	},
 	"required": [
-		"kicker",
+		"keywords",
 		"title",
 		"subtitle",
 		"body",

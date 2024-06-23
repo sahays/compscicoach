@@ -25,7 +25,7 @@ pub struct AuthorEntity {
     pub intro: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PostEntity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub _id: Option<ObjectId>,

@@ -32,7 +32,7 @@ pub async fn get_tag_list(
     handlebars: web::Data<Handlebars<'_>>,
     mongoc: web::Data<Client>,
 ) -> impl Responder {
-    let collection = Database::new(&mongoc, "tags");
+    let collection = Database::get_collection(&mongoc, "tags");
     match db_ops::Database::find_all::<TagEntity>(collection).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
@@ -59,7 +59,7 @@ pub async fn get_edit_tag(
     path: web::Path<String>,
 ) -> impl Responder {
     let tag_id = path.into_inner();
-    let collection = Database::new(&mongoc, "tags");
+    let collection = Database::get_collection(&mongoc, "tags");
     match db_ops::Database::find::<TagEntity>(collection, tag_id).await {
         EntityResult::Success(r) => {
             debug!("{:?}", r);
@@ -92,7 +92,7 @@ pub async fn post_create_tag(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "tags");
+            let collection = Database::get_collection(&mongoc, "tags");
             match db_ops::Database::create(collection, model.to()).await {
                 EntityResult::Success(r) => {
                     info!("Tag created {:?}", r);
@@ -125,7 +125,7 @@ pub async fn post_edit_tag(
         serde_json::to_string(&model).unwrap().as_str(),
     ) {
         JsonOpsResult::Success(_) => {
-            let collection = Database::new(&mongoc, "tags");
+            let collection = Database::get_collection(&mongoc, "tags");
             match Database::update(collection, model.to(), tag_id).await {
                 EntityResult::Success(r) => {
                     info!("Tag updated {:?}", r);
