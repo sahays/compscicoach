@@ -3,7 +3,7 @@ use handlebars::Handlebars;
 use log::error;
 use mongodb::Client;
 
-use pulldown_cmark::{html, Parser};
+// use pulldown_cmark::{html, Parser};
 use serde_json::json;
 
 use crate::{
@@ -12,7 +12,7 @@ use crate::{
         result_types::EntityResult,
     },
     models::PostResponseModel,
-    utils::{db_ops::Database, file_ops},
+    utils::{db_ops::Database, file_ops, string_ops},
 };
 
 #[get("/")]
@@ -23,7 +23,7 @@ pub async fn get_posts(
     render_template!(
         handlebars,
         "blog-home",
-        json!({"title": "Hello!", "model": "world"})
+        json!({"title": "Computer Science Coach", "model": "world"})
     )
 }
 
@@ -79,11 +79,11 @@ pub async fn get_post(
             }
         };
 
-    let parser = Parser::new(post_markdown.as_str());
-    // Allocate a string for the HTML output
-    let mut html_output = String::new();
-    // Convert markdown to HTML
-    html::push_html(&mut html_output, parser);
+    // let parser = Parser::new(post_markdown.as_str());
+    // // Allocate a string for the HTML output
+    // let mut html_output = String::new();
+    // // Convert markdown to HTML
+    // html::push_html(&mut html_output, parser);
 
     render_template!(
         handlebars,
@@ -91,7 +91,7 @@ pub async fn get_post(
         json!({
             "title": model.title,
             "description":  model.description,
-            "body": html_output,
+            "body": string_ops::escape(&post_markdown),
             "model": model
         })
     )

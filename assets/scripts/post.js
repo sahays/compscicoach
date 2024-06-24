@@ -223,7 +223,6 @@ $(function () {
 
 		var payload = {
 			title: $("#title").val(),
-			kicker: $("#kicker").val(),
 			subtitle: $("#subtitle").val(),
 			body: $("#body-url").val(),
 			keywords: $("#keywords").val(),
