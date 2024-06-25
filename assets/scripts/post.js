@@ -228,16 +228,16 @@ $(function () {
 			keywords: $("#keywords").val(),
 			tldr: $("#tldr").val(),
 			hero_image: $("#hero-image-url").val(),
-			publish_date: parseInt($("#publish_timestamp").val()),
-			modified_date: $("#modified_timestamp")
-				? parseInt($("#modified_timestamp").val())
-				: undefined,
+			publish_date: Date.parse($("#publish_date").val()),
+			modified_date: Date.parse($("#modified_timestamp").val()),
 			author: $("#authors").val(),
 			tag: $("#tags").val(),
 			permalink: $("#permalink").val(),
 			description: $("#description").val(),
 		};
 		console.log(payload);
+
+		return;
 
 		var schema = JSON.parse($("#schema").val());
 		const ajv = new Ajv({ allErrors: true });

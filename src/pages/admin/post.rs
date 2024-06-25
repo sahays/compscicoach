@@ -46,7 +46,7 @@ pub async fn get_create_post(
         "post-create",
         json!({
             "title": "Add a new Post",
-            "timestamp": chrono::Local::now().timestamp(),
+            "timestamp": date_ops::to_input_date(),
             "authors": AuthorResponseModel::from_vec(authors),
             "tags": TagResponseModel::from_vec(tags),
             "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
@@ -169,8 +169,8 @@ pub async fn get_edit_post(
                     "body_markdown": format!("/assets/markdowns/{}.md",post.body),
                     "authors": AuthorResponseModel::from_vec(authors.clone()),
                     "tags": TagResponseModel::from_vec(tags.clone()),
-                    "timestamp": date_ops::to_timestamp(),
-                    "published_timestamp": date_ops::to_timestamp_from(r.publish_date),
+                    "timestamp": date_ops::to_input_date(),
+                    "published_timestamp": date_ops::to_input_date_from(r.publish_date),
                     "schema": file_ops::read_file("./assets/schema/post-schema.json").unwrap()
                 })
             )

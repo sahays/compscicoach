@@ -4,13 +4,26 @@ pub fn local_date() -> NaiveDateTime {
     Local::now().naive_local()
 }
 
-pub fn to_local_date(date: NaiveDateTime) -> String {
+pub fn to_display_date(date: NaiveDateTime) -> String {
     Local
         .from_local_datetime(&date)
         .unwrap()
         .naive_local()
         .format("%v")
         .to_string()
+}
+
+pub fn to_input_date_from(date: NaiveDateTime) -> String {
+    Local
+        .from_local_datetime(&date)
+        .unwrap()
+        .naive_local()
+        .format("%Y-%m-%d")
+        .to_string()
+}
+
+pub fn to_input_date() -> String {
+    Local::now().naive_local().format("%Y-%m-%d").to_string()
 }
 
 pub fn to_timestamp_from(date: NaiveDateTime) -> String {

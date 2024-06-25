@@ -120,6 +120,17 @@
                             {{/each}}
                         </select>
                     </div>
+                    <div class="mb-4 flex-1">
+                        <label for="publish_date" class="block text-gray-700  dark:text-white text-sm mb-2">Publish
+                            Date:</label>
+                        <input type="date" id="publish_date" name="publish_date" required
+                            value="{{published_timestamp}}">
+                    </div>
+                    <div class="mb-4 flex-1">
+                        <label for="modified_date" class="block text-gray-700  dark:text-white text-sm mb-2">Modified
+                            Date:</label>
+                        <input type="date" id="modified_date" name="modified_date" required value="{{timestamp}}">
+                    </div>
                 </div>
 
 

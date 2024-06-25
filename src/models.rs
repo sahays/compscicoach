@@ -209,8 +209,8 @@ impl PostResponseModel {
             tldr: entity.tldr.to_string(),
             hero_image: entity.hero_image.hero_r_path(),
             profile_image: entity.hero_image.profile_r_path(),
-            publish_date: date_ops::to_local_date(entity.publish_date).to_string(),
-            modified_date: date_ops::to_local_date(entity.modified_date).to_string(),
+            publish_date: date_ops::to_display_date(entity.publish_date).to_string(),
+            modified_date: date_ops::to_display_date(entity.modified_date).to_string(),
             author: AuthorResponseModel::default(),
             tag: TagResponseModel::default(),
         }
@@ -279,8 +279,8 @@ impl PostResponseModel {
                 tldr: post.tldr.clone(),
                 hero_image: post.hero_image.hero_r_path(),
                 profile_image: post.hero_image.profile_r_path(),
-                publish_date: date_ops::to_local_date(post.publish_date).to_string(),
-                modified_date: date_ops::to_local_date(post.modified_date).to_string(),
+                publish_date: date_ops::to_display_date(post.publish_date).to_string(),
+                modified_date: date_ops::to_display_date(post.modified_date).to_string(),
                 author: post_author,
                 tag: post_tag,
             };
@@ -303,8 +303,8 @@ impl PostResponseModel {
             tldr: entity.tldr.to_string(),
             hero_image: entity.hero_image.hero_r_path(),
             profile_image: entity.hero_image.profile_r_path(),
-            publish_date: date_ops::to_local_date(entity.publish_date).to_string(),
-            modified_date: date_ops::to_local_date(entity.modified_date).to_string(),
+            publish_date: date_ops::to_display_date(entity.publish_date).to_string(),
+            modified_date: date_ops::to_display_date(entity.modified_date).to_string(),
             author: authors
                 .iter()
                 .find(|author| {
