@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use futures::stream::TryStreamExt;
+use log::debug;
 use mongodb::{
     bson::{self, doc, oid::ObjectId, Bson},
     Client, Collection,
@@ -118,6 +119,9 @@ impl Database {
 
         let filter = doc! { "_id": object_id };
         let update = doc! { "$set": bson::to_bson(&entity).unwrap() };
+
+        debug!("Filter: {:?}", filter);
+        debug!("Update: {:?}", update);
 
         match collection.update_one(filter, update, None).await {
             Ok(result) => {
